@@ -219,7 +219,7 @@
       claude-code
       code-cursor
       brave
-      bisq2
+      qbittorrent
       burpsuite
       zoom-us
       wireshark
