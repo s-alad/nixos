@@ -20,6 +20,9 @@
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [
+    "i915.enable_psr=0"
+  ];
   # --- systemd initrd for TPM2 auto-unlock
   boot.initrd.systemd.enable = true;
   # --- LUKS devices (TPM2 enrolled)
@@ -322,10 +325,10 @@
     enableSSHSupport = true;
   };
   # --- NH https://github.com/nix-community/nh
-  programs.nh = {
-    enable = true;
-    clean.enable = true;
-  };
+  # programs.nh = {
+  #   enable = true;
+  #   clean.enable = true;
+  # };
 
 
   ##### SYSTEM
