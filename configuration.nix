@@ -228,6 +228,7 @@
       mullvad-vpn
       postman
       redisinsight
+      google-chrome
       # stremio
     ];
   };
@@ -290,6 +291,7 @@
     vlc
     ocaml
     redis
+    chromium
   ];
 
 
