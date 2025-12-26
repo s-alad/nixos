@@ -229,6 +229,9 @@
       postman
       redisinsight
       google-chrome
+      obs-studio
+      element-desktop
+      gimp2
       # stremio
     ];
   };
