@@ -233,6 +233,7 @@
       element-desktop
       gimp2
       google-cloud-sdk
+      awscli2
       # stremio
     ];
   };
