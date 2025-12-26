@@ -304,6 +304,7 @@
     clippy
     rust-analyzer
     gh
+    starship
   ];
 
 
@@ -359,6 +360,8 @@
   #   enable = true;
   #   clean.enable = true;
   # };
+  # --- starship prompt
+  programs.starship.enable = true;
 
 
   ##### SYSTEM
