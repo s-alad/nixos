@@ -209,6 +209,7 @@
   ##### USERS
   users.users.salad = {
     isNormalUser = true;
+    shell = pkgs.zsh;
     description = "salad";
     extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" ];
     packages = with pkgs; [
@@ -308,6 +309,10 @@
   ];
 
 
+  ##### SHELLS
+  environment.shells = with pkgs; [ zsh ];
+
+
   ##### DOCKER
   virtualisation.docker = {
     enable = true;
@@ -360,8 +365,34 @@
   #   enable = true;
   #   clean.enable = true;
   # };
+  # --- zsh
+  programs.zsh = {
+    enable = true;
+
+    enableCompletion = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      ll = "ls -l";
+      ns = "sudo nixos-rebuild switch";
+    };
+
+    histSize = 10000;
+    histFile = "$HOME/.zsh_history";
+    setOptions = [
+      "HIST_IGNORE_ALL_DUPS"
+    ];
+  };
+  programs.zsh.initExtra = ''
+    eval "$(starship init zsh)"
+  '';
   # --- starship prompt
-  programs.starship.enable = true;
+  programs.starship = {
+    enable = true;
+
+    # settings = { ... };
+  };
 
 
   ##### SYSTEM
