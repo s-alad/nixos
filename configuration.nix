@@ -140,6 +140,13 @@
   ### CINNAMON
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.cinnamon.enable = true;
+  ### GNOME
+  # services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.desktopManager.gnome.enable = true;
+  ### KDE
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
+  # services.desktopManager.plasma6.enable = true;
   ### SOUND with pipewire
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -157,6 +164,9 @@
   powerManagement.enable = true;
   # --- X11 windowing system
   services.xserver.enable = true;
+  services.xserver.displayManager.sessionCommands = ''
+    xrandr --output eDP-1 --mode 3200x2000 --rate 120
+  '';
   # --- NVIDIA + intel hybrid graphics ; ThinkPad P1 Gen 8
   services.xserver.videoDrivers = [ "modesetting" "nvidia" ];
   # --- firmware updates
@@ -248,7 +258,7 @@
     efibootmgr
     pciutils
     usbutils
-    btop
+    btop-cuda
     htop
     git
     mesa-demos
