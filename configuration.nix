@@ -237,7 +237,7 @@
       awscli2
       gitfetch
       stremio
-      libreoffice-fresh
+      libreoffice
     ];
   };
 
