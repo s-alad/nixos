@@ -1,0 +1,270 @@
+# ~/.config/starship.toml
+
+format = """$time $status$sudo $username[@](cyan)$hostname $directory $character"""
+
+#right_format = """$localip $git_branch$git_commit$git_status$git_metrics - $all"""
+right_format = """$git_branch$git_commit$git_status$git_metrics"""
+
+[username]
+style_user = "gray"
+format = '[$user](cyan)'
+show_always = true
+
+[hostname]
+ssh_only = false
+format = "[$hostname](cyan)"
+
+[character]
+success_symbol = '[\$](gray)'
+error_symbol = '[\$](gray)'
+vicmd_symbol = '[\$](gray)'
+
+[directory]
+format = '[\[](gray)[$path](gray)[\]](gray)'
+truncation_length = 0
+truncate_to_repo = false
+
+[time]
+format = '[$time](#888888)'
+disabled = false
+
+[sudo]
+format = ' [$symbol]($style)'
+style = 'cyan'
+symbol = '§'
+disabled = false
+
+[localip]
+ssh_only = false
+format = '::[$localipv4](white)'
+disabled = false
+
+[git_branch]
+format = '\[[⎇ $branch]($style)\]'
+style = 'green'
+
+[git_status]
+format = '([\[$all_status$ahead_behind\]]($style))'
+style = 'green'
+
+[git_commit]
+format = '\[[$hash$tag]($style)\]'
+style = 'green'
+
+[git_metrics]
+disabled = true
+
+[kubernetes]
+format = '\[[$symbol$context( \($namespace\))]($style)\]'
+disabled = false
+
+[cmd_duration]
+format = '\[[⏱ $duration]($style)\]'
+disabled = true
+
+[status]
+disabled = false
+
+# Success
+success_symbol = 'λ'
+success_style = 'gray'
+
+# Generic failure
+symbol = '!'
+style = 'bold red'
+
+# Specific error types
+not_executable_symbol = 'x'
+not_found_symbol = '?'
+sigint_symbol = 'i'
+signal_symbol = 's'
+
+recognize_signal_code = true
+map_symbol = true
+
+# Only show the symbol
+format = '[$symbol]($style)'
+
+[line_break]
+disabled = true
+
+# ===============================================
+
+[aws]
+format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
+
+[bun]
+format = '\[[$symbol($version)]($style)\]'
+
+[c]
+format = '\[[$symbol($version(-$name))]($style)\]'
+
+[cpp]
+format = '\[[$symbol($version(-$name))]($style)\]'
+
+[cmake]
+format = '\[[$symbol($version)]($style)\]'
+
+[cobol]
+format = '\[[$symbol($version)]($style)\]'
+
+[conda]
+format = '\[[$symbol$environment]($style)\]'
+
+[crystal]
+format = '\[[$symbol($version)]($style)\]'
+
+[daml]
+format = '\[[$symbol($version)]($style)\]'
+
+[dart]
+format = '\[[$symbol($version)]($style)\]'
+
+[deno]
+format = '\[[$symbol($version)]($style)\]'
+
+[docker_context]
+format = '\[[$symbol$context]($style)\]'
+
+[dotnet]
+format = '\[[$symbol($version)(🎯 $tfm)]($style)\]'
+
+[elixir]
+format = '\[[$symbol($version \(OTP $otp_version\))]($style)\]'
+
+[elm]
+format = '\[[$symbol($version)]($style)\]'
+
+[erlang]
+format = '\[[$symbol($version)]($style)\]'
+
+[fennel]
+format = '\[[$symbol($version)]($style)\]'
+
+[fossil_branch]
+format = '\[[$symbol$branch]($style)\]'
+
+[gcloud]
+format = '\[[$account(@$domain)(\($region\))]($style)\]'
+style = 'bold yellow'
+disabled = true
+
+[golang]
+format = '\[[go ($version)]($style)\]'
+
+[gradle]
+format = '\[[$symbol($version)]($style)\]'
+
+[guix_shell]
+format = '\[[$symbol]($style)\]'
+
+[haskell]
+format = '\[[$symbol($version)]($style)\]'
+
+[haxe]
+format = '\[[$symbol($version)]($style)\]'
+
+[helm]
+format = '\[[$symbol($version)]($style)\]'
+
+[hg_branch]
+format = '\[[$symbol$branch]($style)\]'
+
+[java]
+format = '\[[$symbol($version)]($style)\]'
+
+[julia]
+format = '\[[$symbol($version)]($style)\]'
+
+[kotlin]
+format = '\[[$symbol($version)]($style)\]'
+
+[lua]
+format = '\[[$symbol($version)]($style)\]'
+
+[memory_usage]
+format = '\[$symbol[$ram( | $swap)]($style)\]'
+
+[meson]
+format = '\[[$symbol$project]($style)\]'
+
+[nim]
+format = '\[[$symbol($version)]($style)\]'
+
+[nix_shell]
+format = '\[[$symbol$state( \($name\))]($style)\]'
+
+[nodejs]
+format = '\[[$symbol($version)]($style)\]'
+
+[ocaml]
+format = '\[[$symbol($version)(\($switch_indicator$switch_name\))]($style)\]'
+
+[opa]
+format = '\[[$symbol($version)]($style)\]'
+
+[openstack]
+format = '\[[$symbol$cloud(\($project\))]($style)\]'
+
+[os]
+format = '\[[$symbol]($style)\]'
+
+[package]
+format = '\[[$symbol$version]($style)\]'
+
+[perl]
+format = '\[[$symbol($version)]($style)\]'
+
+[php]
+format = '\[[$symbol($version)]($style)\]'
+
+[pijul_channel]
+format = '\[[$symbol$channel]($style)\]'
+
+[pixi]
+format = '\[[$symbol$version( $environment)]($style)\]'
+
+[pulumi]
+format = '\[[$symbol$stack]($style)\]'
+
+[purescript]
+format = '\[[$symbol($version)]($style)\]'
+
+[python]
+format = '\[[py ${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+
+[raku]
+format = '\[[$symbol($version-$vm_version)]($style)\]'
+
+[red]
+format = '\[[$symbol($version)]($style)\]'
+
+[ruby]
+format = '\[[$symbol($version)]($style)\]'
+
+[rust]
+format = '\[[$symbol($version)]($style)\]'
+
+[scala]
+format = '\[[$symbol($version)]($style)\]'
+
+[spack]
+format = '\[[$symbol$environment]($style)\]'
+
+[swift]
+format = '\[[$symbol($version)]($style)\]'
+
+[terraform]
+format = '\[[$symbol$workspace]($style)\]'
+
+[vagrant]
+format = '\[[$symbol($version)]($style)\]'
+
+[vlang]
+format = '\[[$symbol($version)]($style)\]'
+
+[zig]
+format = '\[[$symbol($version)]($style)\]'
+
+[solidity]
+format = '\[[$symbol($version)]($style)\]'

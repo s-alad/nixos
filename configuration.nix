@@ -384,18 +384,19 @@
       "HIST_IGNORE_ALL_DUPS"
     ];
   };
-  programs.zsh.initExtra = ''
+  programs.zsh.interactiveShellInit = ''
     eval "$(starship init zsh)"
   '';
   # --- starship prompt
   programs.starship = {
     enable = true;
-
+    settings = ./config.toml;
     # settings = { ... };
   };
 
 
   ##### SYSTEM
+  # system.userActivationScripts.zshrc = "touch .zshrc";
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
