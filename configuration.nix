@@ -164,9 +164,6 @@
   powerManagement.enable = true;
   # --- X11 windowing system
   services.xserver.enable = true;
-  services.xserver.displayManager.sessionCommands = ''
-    xrandr --output eDP-1 --mode 3200x2000 --rate 120
-  '';
   # --- NVIDIA + intel hybrid graphics ; ThinkPad P1 Gen 8
   services.xserver.videoDrivers = [ "modesetting" "nvidia" ];
   # --- firmware updates
