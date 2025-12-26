@@ -237,7 +237,6 @@
       awscli2
       gitfetch
       stremio
-      libreoffice
     ];
   };
 
@@ -307,6 +306,7 @@
     rust-analyzer
     gh
     starship
+    ripgrep
   ];
 
 
