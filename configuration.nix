@@ -295,6 +295,11 @@
     ocaml
     redis
     chromium
+    rustc
+    cargo
+    rustfmt
+    clippy
+    rust-analyzer
   ];
 
 
