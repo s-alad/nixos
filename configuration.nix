@@ -219,6 +219,16 @@
       claude-code
       code-cursor
       brave
+      bisq2
+      burpsuite
+      zoom-us
+      wireshark
+      mongodb-compass
+      obsidian
+      mullvad-vpn
+      postman
+      redisinsight
+      stremio
     ];
   };
 
@@ -277,6 +287,9 @@
     nodejs
     yarn
     go
+    vlc
+    ocaml
+    redis
   ];
 
 
@@ -284,6 +297,8 @@
   virtualisation.docker = {
     enable = true;
   };
+  # virtualisation.podman.enable = true;
+  # virtualisation.podman.dockerCompat = true;
 
 
   ##### NIXPKGS
