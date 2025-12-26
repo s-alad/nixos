@@ -234,6 +234,7 @@
       gimp2
       google-cloud-sdk
       awscli2
+      gitfetch
       # stremio
     ];
   };
@@ -302,6 +303,7 @@
     rustfmt
     clippy
     rust-analyzer
+    gh
   ];
 
 
