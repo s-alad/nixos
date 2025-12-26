@@ -228,7 +228,7 @@
       mullvad-vpn
       postman
       redisinsight
-      stremio
+      # stremio
     ];
   };
 
