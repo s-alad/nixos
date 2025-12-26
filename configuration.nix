@@ -232,6 +232,7 @@
       obs-studio
       element-desktop
       gimp2
+      google-cloud-sdk
       # stremio
     ];
   };
