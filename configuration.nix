@@ -236,7 +236,8 @@
       google-cloud-sdk
       awscli2
       gitfetch
-      # stremio
+      stremio
+      libreoffice-fresh
     ];
   };
 
