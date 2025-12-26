@@ -20,8 +20,19 @@
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  # --- silent boot
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
   boot.kernelParams = [
+    # - intel reduce flickering
     "i915.enable_psr=0"
+    # - clean boot
+    "quiet"
+    "splash"
+    "intremap=on"
+    "boot.shell_on_fail"
+    "udev.log_priority=3"
+    "rd.systemd.show_status=auto"
   ];
   # --- systemd initrd for TPM2 auto-unlock
   boot.initrd.systemd.enable = true;
@@ -37,21 +48,11 @@
     };
   };
   # --- plymouth startup animation
-  # boot.plymouth = {
-  #  enable = true;
-  #  theme = "bgrt";
-  # };
-  # --- silent boot
-  # boot.consoleLogLevel = 3;
-  # boot.initrd.verbose = false;
-  # boot.kernelParams = [
-  #  "quiet"
-  # "splash"
-  #  "boot.shell_on_fail"
-  #  "udev.log_priority=3"
-  #  "rd.systemd.show_status=auto"
-  # ];
-  # hide the OS choice for bootloaders unless any key pressed
+  boot.plymouth = {
+   enable = true;
+   # theme = "bgrt";
+  };
+  # --- hide the OS choice for bootloaders unless any key pressed
   # boot.loader.timeout = 0;
 
   
