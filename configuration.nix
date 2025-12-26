@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports =
@@ -390,7 +390,7 @@
   # --- starship prompt
   programs.starship = {
     enable = true;
-    settings = ./config.toml;
+    settings = lib.importTOML ./config.toml;
     # settings = { ... };
   };
 
