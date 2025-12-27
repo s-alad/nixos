@@ -150,8 +150,18 @@ in
 
   ##### SERVICES
   ### CINNAMON
-  services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.cinnamon.enable = true;
+  services.xserver.displayManager.lightdm = {
+    enable = true;
+    background = /home/salad/Pictures/sine.jpg;
+    greeters.gtk = {
+      enable = true;
+      extraConfig = ''
+        xft-dpi = 144
+        background = /home/salad/Pictures/sine.jpg
+      '';
+    };
+  };
   ### GNOME
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
