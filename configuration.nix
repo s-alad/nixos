@@ -160,7 +160,6 @@ in
       extraConfig = ''
         enable-hidpi = on
         background = /etc/lightdm-background.jpg
-        stretch = false
       '';
     };
   };
