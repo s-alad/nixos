@@ -241,6 +241,7 @@ in
       gitfetch
       libreoffice
       prismlauncher
+      modrinth-app
       #stremio
     ];
   };
@@ -318,8 +319,8 @@ in
     starship
     ripgrep
     jdk
-    nixai
     jq
+    uv
   ];
 
 
