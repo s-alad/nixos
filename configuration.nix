@@ -1,10 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  nixai = pkgs.callPackage (builtins.fetchGit {
-    url = "https://github.com/olafkfreund/nix-ai-help.git";
-    ref = "main";
-  } + "/package.nix") {};
+  nixai = (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
 in
 {
   imports =
