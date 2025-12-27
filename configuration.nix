@@ -237,6 +237,7 @@
       awscli2
       gitfetch
       libreoffice
+      prismlauncher
       #stremio
     ];
   };
