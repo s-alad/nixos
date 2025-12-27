@@ -157,6 +157,12 @@ in
     
     greeters.slick = {
       enable = true;
+      theme = {
+        name = "Mint-Y-Dark";
+      };
+      iconTheme = {
+        name = "Mint-Y";
+      };
       extraConfig = ''
         enable-hidpi = on
         background = /etc/lightdm-background.jpg
@@ -359,6 +365,16 @@ in
     bat
     tmux
     ffmpeg
+
+    gruvbox-gtk-theme
+    arc-theme
+    nordic
+    dracula-theme
+    catppuccin-gtk
+    spacx-gtk-theme
+    palenight-theme
+    oceanic-theme
+    gruvterial-theme
   ];
 
 
