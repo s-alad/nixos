@@ -241,7 +241,7 @@ in
       gitfetch
       libreoffice
       prismlauncher
-      modrinth-app
+      #modrinth-app
       #stremio
     ];
   };
