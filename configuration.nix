@@ -154,13 +154,18 @@ in
   services.xserver.displayManager.lightdm = {
     enable = true;
     background = /home/salad/Pictures/sine.jpg;
+    
     greeters.gtk = {
       enable = true;
       extraConfig = ''
         xft-dpi = 144
         background = /home/salad/Pictures/sine.jpg
+        background-mode = scaled
       '';
     };
+    
+    # Explicitly disable slick greeter
+    greeters.slick.enable = lib.mkForce false;
   };
   ### GNOME
   # services.xserver.displayManager.gdm.enable = true;
