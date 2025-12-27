@@ -336,6 +336,7 @@ in
     pkg-config
     eza
     zoxide
+    fzf
   ];
 
 
@@ -404,7 +405,10 @@ in
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      ll = "ls -l";
+      ll = "eza -lh --group-directories-first --icons --git";
+      la = "eza -lah --group-directories-first --icons";
+      ls = "eza --group-directories-first --icons";
+      lt = "eza --tree --level=2 --group-directories-first --icons";
       ns = "sudo nixos-rebuild switch";
     };
 
@@ -412,9 +416,9 @@ in
       enable = true;
       plugins = [
         "git"
-        "z"
+        # "z"
         "aws"
-        "eza"
+        # "eza"
         "gh"
         "golang"
         "kubectl"
