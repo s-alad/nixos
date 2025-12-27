@@ -344,6 +344,10 @@ in
     zoxide
     fzf
     flameshot
+    syncthing
+    bat
+    tmux
+    ffmpeg
   ];
 
 
