@@ -326,6 +326,7 @@ in
     jq
     uv
     lm_sensors
+    gnumake
   ];
 
 
