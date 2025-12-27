@@ -343,6 +343,7 @@ in
     eza
     zoxide
     fzf
+    flameshot
   ];
 
 
