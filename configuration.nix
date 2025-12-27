@@ -150,22 +150,19 @@ in
 
   ##### SERVICES
   ### CINNAMON
+  environment.etc."lightdm-background.jpg".source = /home/salad/Pictures/sine.jpg;
   services.xserver.desktopManager.cinnamon.enable = true;
   services.xserver.displayManager.lightdm = {
     enable = true;
-    background = /home/salad/Pictures/sine.jpg;
     
-    greeters.gtk = {
+    greeters.slick = {
       enable = true;
       extraConfig = ''
-        xft-dpi = 144
-        background = /home/salad/Pictures/sine.jpg
-        background-mode = scaled
+        enable-hidpi = on
+        background = /etc/lightdm-background.jpg
+        stretch = false
       '';
     };
-    
-    # Explicitly disable slick greeter
-    greeters.slick.enable = lib.mkForce false;
   };
   ### GNOME
   # services.xserver.displayManager.gdm.enable = true;
