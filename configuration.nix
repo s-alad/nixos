@@ -193,7 +193,7 @@ in
   # --- mouse support in tty
   services.gpm.enable = true;
   # --- fingerprint reader (Synaptics 06cb:00f9)
-  # services.fprintd.enable = true;
+  services.fprintd.enable = true;
   # --- allow both fingerprint AND password authentication
   # security.pam.services.login.fprintAuth = false;
   # --- enable fingerprint for specific services
