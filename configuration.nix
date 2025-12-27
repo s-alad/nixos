@@ -319,6 +319,7 @@ in
     ripgrep
     jdk
     nixai
+    jq
   ];
 
 
