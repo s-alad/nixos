@@ -269,6 +269,11 @@
     mesa
     libdrm
   ];
+  # --- JAVA
+  programs.java = {
+    enable = true;
+    package = pkgs.jdk;
+  };
 
 
   ##### PACKAGES
@@ -308,6 +313,7 @@
     gh
     starship
     ripgrep
+    jdk
   ];
 
 
