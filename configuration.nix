@@ -334,6 +334,8 @@ in
     gnumake
     gcc
     pkg-config
+    eza
+    zoxide
   ];
 
 
@@ -404,6 +406,22 @@ in
     shellAliases = {
       ll = "ls -l";
       ns = "sudo nixos-rebuild switch";
+    };
+
+    ohMyZsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "z"
+        "aws"
+        "eza"
+        "gh"
+        "golang"
+        "kubectl"
+        "npm"
+        "ssh"
+        "zoxide"
+      ];
     };
 
     histSize = 10000;
