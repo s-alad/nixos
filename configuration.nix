@@ -150,7 +150,8 @@ in
 
   ##### SERVICES
   ### CINNAMON
-  services.xserver.displayManager.gdm.enable = true;
+  #services.xserver.displayManager.lightdm.enable = true;
+  services.displayManager.gdm.enable = true;
   services.xserver.desktopManager.cinnamon.enable = true;
   ### GNOME
   # services.xserver.displayManager.gdm.enable = true;
