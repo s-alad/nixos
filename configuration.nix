@@ -58,9 +58,9 @@ in
   # --- hide the OS choice for bootloaders unless any key pressed
   # boot.loader.timeout = 0;
   # --- wifi crash management
-  # boot.extraModprobeConfig = ''
-  #   options iwlwifi power_save=0 swcrypto=1 11n_disable=8
-  # '';
+  boot.extraModprobeConfig = ''
+    options iwlwifi power_save=0 swcrypto=1 11n_disable=8
+  '';
 
 
   
