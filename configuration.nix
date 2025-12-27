@@ -1,5 +1,11 @@
 { config, pkgs, lib, ... }:
 
+let
+  nixai = pkgs.callPackage (builtins.fetchGit {
+    url = "https://github.com/olafkfreund/nix-ai-help.git";
+    ref = "main";
+  } + "/package.nix") {};
+in
 {
   imports =
     [
@@ -315,6 +321,7 @@
     starship
     ripgrep
     jdk
+    nixai
   ];
 
 
