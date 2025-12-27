@@ -193,13 +193,19 @@ in
   # --- mouse support in tty
   services.gpm.enable = true;
   # --- fingerprint reader (Synaptics 06cb:00f9)
-  services.fprintd.enable = true;
+  # services.fprintd.enable = true;
   # --- allow both fingerprint AND password authentication
   # security.pam.services.login.fprintAuth = false;
   # --- enable fingerprint for specific services
   # security.pam.services.lightdm.fprintAuth = true;
   # security.pam.services.sudo.fprintAuth = true;
   # security.pam.services.polkit-1.fprintAuth = true;
+  # services.udev.extraRules = ''
+  #   # Disable USB autosuspend for Synaptics fingerprint reader
+  #   ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="06cb", 
+  # ATTR{idProduct}=="00f9", ATTR{power/autosuspend}="-1"
+  # '';
+
 
 
   ### XDG
@@ -251,13 +257,11 @@ in
   # --- firefox
   programs.firefox.enable = true;
   # --- steam
-  # programs.steam = {
-  #  enable = true;
-  #  remotePlay.openFirewall = true;  # Open ports in firewall for Steam Remote Play
-  #  dedicatedServer.openFirewall = true;  # Open ports for Source Dedicated Server
-  #  localNetworkGameTransfers.openFirewall = true;  # Open ports for Steam Local Network Game Transfers
-  #  gamescopeSession.enable = true;  # Enable GameScope for better gaming performance
-  # };
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
   # --- gamemode (automatic performance optimizations when gaming)
   # programs.gamemode.enable = true;
   # --- prebuilt linux binaries
@@ -321,6 +325,7 @@ in
     jdk
     jq
     uv
+    lm_sensors
   ];
 
 
