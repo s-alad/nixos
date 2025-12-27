@@ -252,6 +252,12 @@ in
       gitfetch
       libreoffice
       prismlauncher
+      cbonsai
+      cowsay
+      cmatrix
+      sl
+      oneko
+      lolcat
       #modrinth-app
       #stremio
     ];
@@ -425,6 +431,7 @@ in
         "npm"
         "ssh"
         "zoxide"
+        "aliases"
       ];
     };
 
