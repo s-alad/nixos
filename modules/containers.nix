@@ -1,12 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
-  # docker containerization
+  # --- docker containerization
   virtualisation.docker = {
     enable = true;
   };
 
-  # podman alternative
+  # --- podman alternative
   # virtualisation.podman = {
   #   enable = true;
   #   dockerCompat = true;  # Docker compatibility

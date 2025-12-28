@@ -7,6 +7,6 @@
     dedicatedServer.openFirewall = true;
   };
 
-  # gamemode (automatic performance optimizations when gaming)
+  # --- gamemode (automatic performance optimizations when gaming)
   programs.gamemode.enable = true;
 }

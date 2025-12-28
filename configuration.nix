@@ -18,7 +18,10 @@ in
       ./modules/gpg-ssh.nix
       ./modules/nix-ld.nix
       ./modules/steam.nix
+      ./modules/mullvad.nix
+      ./modules/programs.nix
     ];
+
 
   ##### BOOTLOADER
   boot.loader.systemd-boot.enable = true;
@@ -55,19 +58,15 @@ in
     };
   };
   # --- plymouth startup animation
-  boot.plymouth = {
-   enable = true;
-   # theme = "bgrt";
-  };
+  boot.plymouth.enable = true;
   # --- hide the OS choice for bootloaders unless any key pressed
-  # boot.loader.timeout = 0;
+  boot.loader.timeout = 0;
   # --- wifi crash management
   boot.extraModprobeConfig = ''
     options iwlwifi power_save=0 swcrypto=1 11n_disable=8
   '';
+  #####
 
-
-  
 
   ##### NETWORKING 
   # --- hostname
@@ -78,6 +77,7 @@ in
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # networking.firewall.enable = false;
+  #####
 
 
   ##### HARDWARE
@@ -120,6 +120,7 @@ in
     enable = true;
     powerOnBoot = true;
   };
+  #####
 
 
   ##### ENV
@@ -130,6 +131,7 @@ in
     export GOPATH="$HOME/.local/share/go"
     export PATH="$PATH:$GOPATH/bin"
   '';
+  #####
 
 
   ##### SERVICES
@@ -249,33 +251,6 @@ in
   };
 
 
-  ##### PROGRAMS
-  # --- firefox
-  programs.firefox.enable = true;
-  # --- JAVA
-  programs.java = {
-    enable = true;
-    package = pkgs.jdk;
-  };
-  # --- ADB
-  programs.adb.enable = true;
-  # --- wireshark
-  programs.wireshark.enable = true;
-  # --- obs-studio
-  programs.obs-studio = {
-    enable = true;
-    enableVirtualCamera = true;
-    package = pkgs.obs-studio.override { cudaSupport = true; };
-  };
-  # --- mullvad vpn
-  services.mullvad-vpn = {
-    enable = true;
-    package = pkgs.mullvad-vpn;
-  };
-  # --- systemd-resolved (required for mullvad)
-  services.resolved.enable = true;
-
-
   ##### PACKAGES
   environment.systemPackages = with pkgs; [
     vim
@@ -356,13 +331,6 @@ in
       auto-optimise-store = true;
     };
   };
-
-
-  ##### NH https://github.com/nix-community/nh
-  # programs.nh = {
-  #   enable = true;
-  #   clean.enable = true;
-  # };
 
 
   ##### SYSTEM

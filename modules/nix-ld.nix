@@ -5,7 +5,7 @@
   programs.nix-ld.enable = true;
 
   programs.nix-ld.libraries = with pkgs; [
-    # --- core libraries
+    # - core libraries
     fuse2
     stdenv.cc.cc
     zlib
@@ -18,7 +18,7 @@
     libpng
     expat
 
-    # --- X11 and graphics
+    # - X11 and graphics
     xorg.libX11
     xorg.libxcb
     xorg.libXext
@@ -44,22 +44,22 @@
     libglvnd
     vulkan-loader
 
-    # --- wayland
+    # - wayland
     wayland
 
-    # --- audio and input
+    # - audio and input
     dbus
     alsa-lib
     libxkbcommon
 
-    # --- Qt6 libraries (for Android Emulator GUI)
+    # - Qt6 libraries (for Android Emulator GUI)
     qt6.qtbase
     qt6.qtwayland
     qt6.qtsvg
     qt6.qtdeclarative
     qt6.qt5compat
 
-    # --- fonts and rendering
+    # - fonts and rendering
     fontconfig
     freetype
     cairo
@@ -67,11 +67,11 @@
     gdk-pixbuf
     harfbuzz
 
-    # --- accessibility
+    # - accessibility
     at-spi2-core
     at-spi2-atk
 
-    # --- XML/data processing
+    # - XML/data processing
     libxslt
     libxml2
     icu
