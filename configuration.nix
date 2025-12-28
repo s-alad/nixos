@@ -288,6 +288,7 @@ in
       oneko
       lolcat
       unityhub
+      android-studio
       #modrinth-app
       #stremio
     ];
