@@ -24,6 +24,8 @@ in
       ./modules/containers.nix
       ./modules/zsh.nix
       ./modules/starship.nix
+      ./modules/gpg-ssh.nix
+      ./modules/nix-ld.nix
     ];
 
 
@@ -285,67 +287,6 @@ in
   };
   # --- gamemode (automatic performance optimizations when gaming)
   # programs.gamemode.enable = true;
-  # --- prebuilt linux binaries
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    fuse2
-    stdenv.cc.cc
-    zlib
-    openssl
-    glib
-    gtk3
-    xorg.libX11
-    xorg.libxcb
-    mesa
-    libdrm
-    nss
-    nspr
-    pulseaudio
-    libpng
-    expat
-    # --- additions for Android Studio emulator / QEMU / X11 ---
-    dbus
-    alsa-lib
-    libxkbcommon
-    xorg.libXext
-    xorg.libXi
-    xorg.libXrender
-    xorg.libXrandr
-    xorg.libXtst
-    xorg.libXcursor
-    xorg.libXfixes
-    xorg.libXdamage
-    xorg.libXcomposite
-    xorg.libXinerama
-    xorg.libxkbfile
-    libGL
-    wayland
-    # --- Qt libraries for Android Emulator GUI ---
-    qt6.qtbase
-    qt6.qtwayland
-    qt6.qtsvg
-    qt6.qtdeclarative
-    qt6.qt5compat
-    libglvnd
-    vulkan-loader
-    fontconfig
-    freetype
-    libxslt
-    libxml2
-    icu
-    xorg.libSM
-    xorg.libICE
-    xorg.xcbutilimage
-    xorg.xcbutilkeysyms
-    xorg.xcbutilrenderutil
-    xorg.xcbutilwm
-    at-spi2-core
-    at-spi2-atk
-    cairo
-    pango
-    gdk-pixbuf
-    harfbuzz
-  ];
   # --- JAVA
   programs.java = {
     enable = true;
@@ -445,11 +386,6 @@ in
   ##### PROGRAMS
   # --- network diagnostic tool
   # programs.mtr.enable = true;
-  # --- GPG/SSH agent
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
   # --- NH https://github.com/nix-community/nh
   # programs.nh = {
   #   enable = true;
