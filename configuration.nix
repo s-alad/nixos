@@ -226,7 +226,7 @@ in
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "salad";
-    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "adbusers" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "adbusers" "wireshark" ];
     packages = with pkgs; [
       thunderbird
       bottles
@@ -238,14 +238,11 @@ in
       qbittorrent
       burpsuite
       zoom-us
-      wireshark
       mongodb-compass
       obsidian
-      mullvad-vpn
       postman
       redisinsight
       google-chrome
-      obs-studio
       element-desktop
       gimp2
       google-cloud-sdk
@@ -278,6 +275,21 @@ in
   };
   # --- ADB
   programs.adb.enable = true;
+  # --- wireshark
+  programs.wireshark.enable = true;
+  # --- obs-studio
+  programs.obs-studio = {
+    enable = true;
+    enableVirtualCamera = true;
+    package = pkgs.obs-studio.override { cudaSupport = true; };
+  };
+  # --- mullvad vpn
+  services.mullvad-vpn = {
+    enable = true;
+    package = pkgs.mullvad-vpn;
+  };
+  # --- systemd-resolved (required for mullvad)
+  services.resolved.enable = true;
 
 
   ##### PACKAGES
