@@ -2,17 +2,8 @@
 
 
 let
-  bg = pkgs.runCommand "lightdm-bg.jpg"
-    { nativeBuildInputs = [ pkgs.imagemagick ]; }
-    ''
-      convert ${/home/salad/Pictures/darkcarp.jpeg} \
-        -resize 3200x2000\> \
-        -background black -gravity center -extent 3200x2000 \
-        $out
-    '';
-
-  nixai =
-    (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
+  bg = import ./lib/lightdm-background.nix { inherit pkgs; };
+  nixai = (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
 in
 {
   imports =
@@ -375,8 +366,7 @@ in
   };
 
 
-  ##### PROGRAMS
-  # --- NH https://github.com/nix-community/nh
+  ##### NH https://github.com/nix-community/nh
   # programs.nh = {
   #   enable = true;
   #   clean.enable = true;
