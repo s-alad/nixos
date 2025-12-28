@@ -8,5 +8,5 @@
   };
 
   # gamemode (automatic performance optimizations when gaming)
-  # programs.gamemode.enable = true;
+  programs.gamemode.enable = true;
 }
