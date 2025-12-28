@@ -1,7 +1,18 @@
 { config, pkgs, lib, ... }:
 
+
 let
-  nixai = (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
+  bg = pkgs.runCommand "lightdm-bg.jpg"
+    { nativeBuildInputs = [ pkgs.imagemagick ]; }
+    ''
+      convert ${/home/salad/Pictures/darkcarp.jpeg} \
+        -resize 3200x2000\> \
+        -background black -gravity center -extent 3200x2000 \
+        $out
+    '';
+
+  nixai =
+    (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
 in
 {
   imports =
@@ -11,11 +22,11 @@ in
 
 
   ##### NIX
-  # nix.gc = {
-  #   automatic = true;
-  #   dates = "weekly";
-  #   options = "--delete-older-than 14d";
-  # };
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
 
 
   ##### BOOTLOADER
@@ -150,7 +161,7 @@ in
 
   ##### SERVICES
   ### CINNAMON
-  environment.etc."lightdm-background.jpg".source = /home/salad/Pictures/sine.jpg;
+  environment.etc."lightdm-background.jpg".source = bg;
   services.xserver.desktopManager.cinnamon.enable = true;
   services.xserver.displayManager.lightdm = {
     enable = true;
@@ -166,6 +177,7 @@ in
       extraConfig = ''
         enable-hidpi = on
         background = /etc/lightdm-background.jpg
+        background-mode = center
       '';
     };
   };
