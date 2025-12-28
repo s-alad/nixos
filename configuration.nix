@@ -326,6 +326,8 @@ in
     xorg.libxcb
     mesa
     libdrm
+    nss
+    nspr
   ];
   # --- JAVA
   programs.java = {
