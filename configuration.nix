@@ -245,8 +245,6 @@ in
       unityhub
       android-studio
       watchman
-      #modrinth-app
-      #stremio
     ];
   };
 
@@ -330,7 +328,6 @@ in
     bat
     tmux
     ffmpeg
-
     gruvbox-gtk-theme
     arc-theme
     nordic
