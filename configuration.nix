@@ -18,6 +18,12 @@ in
   imports =
     [
       ./hardware-configuration.nix
+      ./modules/locale.nix
+      ./modules/fonts.nix
+      ./modules/fingerprint.nix
+      ./modules/containers.nix
+      ./modules/zsh.nix
+      ./modules/starship.nix
     ];
 
 
@@ -92,25 +98,6 @@ in
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # networking.firewall.enable = false;
-
-
-  ##### TIME
-  time.timeZone = "America/New_York";
-
-
-  ##### INTL
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
 
 
   ##### HARDWARE
@@ -232,28 +219,6 @@ in
   # services.openssh.enable = true;
   # --- mouse support in tty
   services.gpm.enable = true;
-  
-  
-  ##### Fingerprint (Synaptics 06cb:00f9)
-  services.fprintd.enable = true;
-  security.pam.services = {
-    # --- enable fingerprint at login (password fallback still works)
-    login.fprintAuth = true;
-    # --- enable fingerprint for several services
-    lightdm.fprintAuth = true;
-    sudo.fprintAuth = true;
-    polkit-1.fprintAuth = true;
-    cinnamon-screensaver.fprintAuth = true;
-  };
-  # --- disable USB autosuspend for fingerprint
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="06cb", ATTR{idProduct}=="00f9", ATTR{power/autosuspend}="-1"
-  '';
-  # --- stop fprintd before suspend to prevent corruption
-  powerManagement.powerDownCommands = ''
-    ${pkgs.systemd}/bin/systemctl stop fprintd.service || true
-  '';
-
 
   ### XDG
   xdg.portal = {
@@ -459,14 +424,6 @@ in
   environment.shells = with pkgs; [ zsh ];
 
 
-  ##### DOCKER
-  virtualisation.docker = {
-    enable = true;
-  };
-  # virtualisation.podman.enable = true;
-  # virtualisation.podman.dockerCompat = true;
-
-
   ##### NIXPKGS
   # --- allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -485,19 +442,6 @@ in
   };
 
 
-  ##### FONTS
-  fonts.fontDir.enable = true;
-  fonts.packages = with pkgs; [
-    roboto
-    nerd-fonts.iosevka
-    comic-mono
-    aileron
-    atkinson-hyperlegible
-    cantarell-fonts
-    adwaita-fonts
-  ];
-
-
   ##### PROGRAMS
   # --- network diagnostic tool
   # programs.mtr.enable = true;
@@ -511,56 +455,6 @@ in
   #   enable = true;
   #   clean.enable = true;
   # };
-  # --- zsh
-  programs.zsh = {
-    enable = true;
-
-    enableCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-
-    shellAliases = {
-      ll = "eza -lh --group-directories-first --icons --git";
-      la = "eza -lah --group-directories-first --icons";
-      ls = "eza --group-directories-first --icons";
-      lt = "eza --tree --level=2 --group-directories-first --icons";
-      ns = "sudo nixos-rebuild switch";
-      nu = "sudo nix-channel --update && nix-channel --update && sudo nixos-rebuild switch";
-      cd = "z";
-    };
-
-    ohMyZsh = {
-      enable = true;
-      plugins = [
-        "git"
-        # "z"
-        "aws"
-        # "eza"
-        "gh"
-        "golang"
-        "kubectl"
-        "npm"
-        "ssh"
-        "zoxide"
-        "aliases"
-      ];
-    };
-
-    histSize = 10000;
-    histFile = "$HOME/.zsh_history";
-    setOptions = [
-      "HIST_IGNORE_ALL_DUPS"
-    ];
-  };
-  programs.zsh.interactiveShellInit = ''
-    eval "$(starship init zsh)"
-  '';
-  # --- starship prompt
-  programs.starship = {
-    enable = true;
-    settings = lib.importTOML ./config.toml;
-    # settings = { ... };
-  };
 
 
   ##### SYSTEM
