@@ -289,6 +289,7 @@ in
       lolcat
       unityhub
       android-studio
+      watchman
       #modrinth-app
       #stremio
     ];
