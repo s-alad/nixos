@@ -26,16 +26,8 @@ in
       ./modules/starship.nix
       ./modules/gpg-ssh.nix
       ./modules/nix-ld.nix
+      ./modules/steam.nix
     ];
-
-
-  ##### NIX
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 14d";
-  };
-
 
   ##### BOOTLOADER
   boot.loader.systemd-boot.enable = true;
@@ -279,14 +271,6 @@ in
   ##### PROGRAMS
   # --- firefox
   programs.firefox.enable = true;
-  # --- steam
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-  };
-  # --- gamemode (automatic performance optimizations when gaming)
-  # programs.gamemode.enable = true;
   # --- JAVA
   programs.java = {
     enable = true;
@@ -359,10 +343,6 @@ in
     oceanic-theme
     gruvterial-theme
   ];
-
-
-  ##### SHELLS
-  environment.shells = with pkgs; [ zsh ];
 
 
   ##### NIXPKGS
