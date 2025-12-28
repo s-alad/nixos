@@ -232,19 +232,30 @@ in
   # services.openssh.enable = true;
   # --- mouse support in tty
   services.gpm.enable = true;
-  # --- fingerprint reader (Synaptics 06cb:00f9)
-  # services.fprintd.enable = true;
-  # --- allow both fingerprint AND password authentication
-  # security.pam.services.login.fprintAuth = false;
-  # --- enable fingerprint for specific services
-  # security.pam.services.lightdm.fprintAuth = true;
-  # security.pam.services.sudo.fprintAuth = true;
-  # security.pam.services.polkit-1.fprintAuth = true;
-  # services.udev.extraRules = ''
-  #   # Disable USB autosuspend for Synaptics fingerprint reader
-  #   ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="06cb", 
-  # ATTR{idProduct}=="00f9", ATTR{power/autosuspend}="-1"
-  # '';
+  
+  
+  ##### Fingerprint (Synaptics 06cb:00f9)
+  services.fprintd.enable = true;
+  security.pam.services = {
+    # --- keep login password-based for safety
+    login.fprintAuth = false;
+    # --- enable fingerprint for several services
+    lightdm.fprintAuth = true;
+    sudo.fprintAuth = true;
+    polkit-1.fprintAuth = true;
+    cinnamon-screensaver.fprintAuth = true;
+  };
+  # --- disable USB autosuspend for fingerprint
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="06cb", ATTR{idProduct}=="00f9", ATTR{power/autosuspend}="-1"
+  '';
+  # --- stop fprintd before suspend to prevent corruption
+  powerManagement.powerDownCommands = ''
+    ${pkgs.systemd}/bin/systemctl stop fprintd.service || true
+  '';
+
+
+
 
 
 
