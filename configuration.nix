@@ -237,8 +237,8 @@ in
   ##### Fingerprint (Synaptics 06cb:00f9)
   services.fprintd.enable = true;
   security.pam.services = {
-    # --- keep login password-based for safety
-    login.fprintAuth = false;
+    # --- enable fingerprint at login (password fallback still works)
+    login.fprintAuth = true;
     # --- enable fingerprint for several services
     lightdm.fprintAuth = true;
     sudo.fprintAuth = true;
@@ -253,10 +253,6 @@ in
   powerManagement.powerDownCommands = ''
     ${pkgs.systemd}/bin/systemctl stop fprintd.service || true
   '';
-
-
-
-
 
 
   ### XDG
