@@ -34,6 +34,8 @@ in
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  # --- explicit kernel modules
+  boot.kernelModules = [ "kvm-intel" ];
   # --- silent boot
   boot.consoleLogLevel = 3;
   boot.initrd.verbose = false;
@@ -157,6 +159,10 @@ in
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
   };
+  environment.interactiveShellInit = ''
+    export GOPATH="$HOME/.local/share/go"
+    export PATH="$PATH:$GOPATH/bin"
+  '';
 
 
   ##### SERVICES
