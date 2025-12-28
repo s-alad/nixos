@@ -287,6 +287,7 @@ in
       sl
       oneko
       lolcat
+      unityhub
       #modrinth-app
       #stremio
     ];
