@@ -364,8 +364,6 @@ in
 
 
   ##### PROGRAMS
-  # --- network diagnostic tool
-  # programs.mtr.enable = true;
   # --- NH https://github.com/nix-community/nh
   # programs.nh = {
   #   enable = true;
