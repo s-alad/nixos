@@ -254,7 +254,7 @@ in
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "salad";
-    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "adbusers" ];
     packages = with pkgs; [
       thunderbird
       bottles
@@ -324,6 +324,8 @@ in
     enable = true;
     package = pkgs.jdk;
   };
+  # --- ADB
+  programs.adb.enable = true;
 
 
   ##### PACKAGES
