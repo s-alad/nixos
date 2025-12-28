@@ -472,6 +472,7 @@ in
       lt = "eza --tree --level=2 --group-directories-first --icons";
       ns = "sudo nixos-rebuild switch";
       nu = "sudo nix-channel --update && nix-channel --update && sudo nixos-rebuild switch";
+      cd = "z"
     };
 
     ohMyZsh = {
