@@ -309,6 +309,7 @@ in
     ffmpeg
     dysk
     baobab
+    w3m
     gruvbox-gtk-theme
     arc-theme
     nordic
