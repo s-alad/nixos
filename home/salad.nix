@@ -4,12 +4,9 @@
   home.username = "salad";
   home.homeDirectory = "/home/salad";
 
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
+  # --- home manager state version
   home.stateVersion = "25.11";
 
-  # User packages (migrated from configuration.nix users.users.salad.packages)
   home.packages = with pkgs; [
     thunderbird
     bottles
@@ -45,6 +42,6 @@
     mapscii
   ];
 
-  # Let Home Manager install and manage itself.
+  # --- home manager self management
   programs.home-manager.enable = true;
 }
