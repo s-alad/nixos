@@ -75,45 +75,78 @@ echo ""
 
 # build first commit
 echo "building first commit..."
+echo "(you may need to authenticate with sudo)"
 git checkout -q "$RESOLVED1"
-BUILD1_OUTPUT=$(sudo nixos-rebuild build --no-link 2>&1)
-BUILD1=$(echo "$BUILD1_OUTPUT" | grep -oP '/nix/store/[^ ]+' | head -1)
 
-if [ -z "$BUILD1" ]; then
+# Run build without capturing output first to allow sudo prompt
+echo "running: sudo nixos-rebuild build --no-link"
+if ! sudo nixos-rebuild build --no-link > /tmp/nixos-compare-build1.log 2>&1; then
   echo "error: failed to build first commit"
+  echo "build output saved to /tmp/nixos-compare-build1.log"
+  cat /tmp/nixos-compare-build1.log
   git checkout -q "$ORIGINAL_STATE"
   exit 1
 fi
+
+BUILD1=$(grep -oP '/nix/store/[^ ]+' /tmp/nixos-compare-build1.log | head -1)
+
+if [ -z "$BUILD1" ]; then
+  echo "error: could not extract store path from build output"
+  echo "build output saved to /tmp/nixos-compare-build1.log"
+  cat /tmp/nixos-compare-build1.log
+  git checkout -q "$ORIGINAL_STATE"
+  exit 1
+fi
+
+echo "✓ build 1 complete: ${BUILD1##*/}"
+echo ""
 
 # build second commit
 echo "building second commit..."
 git checkout -q "$RESOLVED2"
-BUILD2_OUTPUT=$(sudo nixos-rebuild build --no-link 2>&1)
-BUILD2=$(echo "$BUILD2_OUTPUT" | grep -oP '/nix/store/[^ ]+' | head -1)
 
-if [ -z "$BUILD2" ]; then
+# Run build without capturing output first to allow sudo prompt
+echo "running: sudo nixos-rebuild build --no-link"
+if ! sudo nixos-rebuild build --no-link > /tmp/nixos-compare-build2.log 2>&1; then
   echo "error: failed to build second commit"
+  echo "build output saved to /tmp/nixos-compare-build2.log"
+  cat /tmp/nixos-compare-build2.log
   git checkout -q "$ORIGINAL_STATE"
   exit 1
 fi
 
-# compare
+BUILD2=$(grep -oP '/nix/store/[^ ]+' /tmp/nixos-compare-build2.log | head -1)
+
+if [ -z "$BUILD2" ]; then
+  echo "error: could not extract store path from build output"
+  echo "build output saved to /tmp/nixos-compare-build2.log"
+  cat /tmp/nixos-compare-build2.log
+  git checkout -q "$ORIGINAL_STATE"
+  exit 1
+fi
+
+echo "✓ build 2 complete: ${BUILD2##*/}"
 echo ""
+
+# compare
 echo "=========================================="
 echo "build 1: $BUILD1"
 echo "build 2: $BUILD2"
 echo ""
 
 if [ "$BUILD1" = "$BUILD2" ]; then
-  echo "identical - no functional changes"
+  echo "✓ identical - no functional changes"
   echo ""
   echo "the configurations produce the exact same system build."
 else
-  echo "store paths differ - analyzing changes..."
+  echo "⚠ store paths differ - analyzing changes..."
   echo ""
   nix-shell -p nix-diff --run "nix-diff '$BUILD1' '$BUILD2'"
 fi
 echo "=========================================="
+
+# cleanup temp files
+rm -f /tmp/nixos-compare-build1.log /tmp/nixos-compare-build2.log
 
 # return to original state
 git checkout -q "$ORIGINAL_STATE"
