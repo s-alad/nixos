@@ -18,7 +18,7 @@ in
       ./modules/gpg-ssh.nix
       ./modules/nix-ld.nix
       ./modules/steam.nix
-      ./modules/mullvad.nix
+      ./modules/vpn.nix
       ./modules/programs.nix
     ];
 
@@ -138,6 +138,7 @@ in
   ### CINNAMON
   environment.etc."lightdm-background.jpg".source = bg;
   services.xserver.desktopManager.cinnamon.enable = true;
+  services.gnome.gnome-keyring.enable = true;
   services.xserver.displayManager.lightdm = {
     enable = true;
     
