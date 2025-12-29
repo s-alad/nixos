@@ -247,6 +247,7 @@ in
       unityhub
       android-studio
       watchman
+      mapscii
     ];
   };
 
