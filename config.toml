@@ -1,19 +1,19 @@
 # ~/.config/starship.toml
 
 # format = """$time $status$sudo $username[@](cyan)$hostname $directory $character"""
-format = """ $status$sudo $username[@](cyan)$hostname $directory $character"""
+format = """ $status$sudo $username[@](bright-green)$hostname $directory $character"""
 
 #right_format = """$localip $git_branch$git_commit$git_status$git_metrics - $all"""
 right_format = """$git_branch$git_commit$git_status$git_metrics"""
 
 [username]
 style_user = "gray"
-format = '[$user](cyan)'
+format = '[$user](bright-green)'
 show_always = true
 
 [hostname]
 ssh_only = false
-format = "[$hostname](cyan)"
+format = "[$hostname](bright-green)"
 
 [character]
 success_symbol = '[\$](gray)'
