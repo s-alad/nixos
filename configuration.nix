@@ -305,6 +305,7 @@ in
     tmux
     ffmpeg
     dysk
+    gnome.baobab
     gruvbox-gtk-theme
     arc-theme
     nordic
