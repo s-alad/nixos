@@ -3,7 +3,7 @@
 pkgs.runCommand "lightdm-bg.jpg"
   { nativeBuildInputs = [ pkgs.imagemagick ]; }
   ''
-    convert ${../assets/darkcarp.jpeg} \
+    convert ${../assets/darkcarpet.jpeg} \
       -resize 3200x2000\> \
       -background black -gravity center -extent 3200x2000 \
       $out
