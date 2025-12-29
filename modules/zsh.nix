@@ -15,8 +15,8 @@
       la = "eza -lah --group-directories-first --icons";
       ls = "eza --group-directories-first --icons";
       lt = "eza --tree --level=2 --group-directories-first --icons";
-      ns = "nh os switch";
-      nu = "nh os switch --update";
+      ns = "nh os switch /etc/nixos";
+      nu = "nh os switch /etc/nixos -u";
       sn = "sudo nixos-rebuild switch";
       un = "sudo nix-channel --update && nix-channel --update && sudo nixos-rebuild switch";
       cd = "z";
