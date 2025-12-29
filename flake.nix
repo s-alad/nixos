@@ -22,6 +22,7 @@
         ({ pkgs, ... }: {
           nixpkgs.config.packageOverrides = pkgs: {
             cinnamon = nixpkgs-stable.legacyPackages.${pkgs.system}.cinnamon;
+            mint-y-icons = nixpkgs-stable.legacyPackages.${pkgs.system}.mint-y-icons;
           };
         })
       ];
