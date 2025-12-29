@@ -304,6 +304,7 @@ in
     bat
     tmux
     ffmpeg
+    dysk
     gruvbox-gtk-theme
     arc-theme
     nordic
