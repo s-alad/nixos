@@ -273,6 +273,7 @@ in
     signal-desktop
     fuse2
     neofetch
+    fastfetch
     file
     nodejs
     yarn
