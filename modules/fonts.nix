@@ -6,6 +6,7 @@
   fonts.packages = with pkgs; [
     roboto
     nerd-fonts.iosevka
+    nerd-fonts.dejavu-sans-mono
     comic-mono
     aileron
     atkinson-hyperlegible
