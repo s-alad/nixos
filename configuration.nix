@@ -274,6 +274,7 @@ in
     fuse2
     neofetch
     fastfetch
+    chafa
     file
     nodejs
     yarn
