@@ -300,6 +300,7 @@ in
     fzf
     flameshot
     syncthing
+    seahorse
     bat
     tmux
     ffmpeg
