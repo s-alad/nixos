@@ -138,7 +138,6 @@ in
   ### CINNAMON
   environment.etc."lightdm-background.jpg".source = bg;
   services.xserver.desktopManager.cinnamon.enable = true;
-  services.gnome.gnome-keyring.enable = true;
   services.xserver.displayManager.lightdm = {
     enable = true;
     
