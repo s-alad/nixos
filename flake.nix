@@ -11,12 +11,19 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, ...}@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, ...}@inputs: {
     nixosConfigurations.salad = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       modules = [
         ./configuration.nix
-        # inputs.home-manager.nixosModules.default
+
+        # home-manager nixos module
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.salad = import ./home.nix;
+        }
 
         # pin cinnamon to stable
         ({ pkgs, ... }: {

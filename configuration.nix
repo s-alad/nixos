@@ -215,40 +215,7 @@ in
     shell = pkgs.zsh;
     description = "salad";
     extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "adbusers" "wireshark" ];
-    packages = with pkgs; [
-      thunderbird
-      bottles
-      discord
-      slack
-      claude-code
-      code-cursor
-      brave
-      qbittorrent
-      burpsuite
-      zoom-us
-      mongodb-compass
-      obsidian
-      postman
-      redisinsight
-      google-chrome
-      element-desktop
-      gimp2
-      google-cloud-sdk
-      awscli2
-      gitfetch
-      libreoffice
-      prismlauncher
-      cbonsai
-      cowsay
-      cmatrix
-      sl
-      oneko
-      lolcat
-      unityhub
-      android-studio
-      watchman
-      mapscii
-    ];
+    # packages moved to home-manager (home.nix)
   };
 
 
