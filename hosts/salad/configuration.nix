@@ -2,24 +2,24 @@
 
 
 let
-  bg = import ./lib/lightdm-background.nix { inherit pkgs; };
+  bg = import ../../lib/lightdm-background.nix { inherit pkgs; };
   nixai = (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
 in
 {
   imports =
     [
       ./hardware-configuration.nix
-      ./modules/locale.nix
-      ./modules/fonts.nix
-      ./modules/fingerprint.nix
-      ./modules/containers.nix
-      ./modules/zsh.nix
-      ./modules/starship.nix
-      ./modules/gpg-ssh.nix
-      ./modules/nix-ld.nix
-      ./modules/steam.nix
-      ./modules/vpn.nix
-      ./modules/programs.nix
+      ../../modules/nixos/locale.nix
+      ../../modules/nixos/fonts.nix
+      ../../modules/nixos/fingerprint.nix
+      ../../modules/nixos/containers.nix
+      ../../modules/nixos/zsh.nix
+      ../../modules/nixos/starship.nix
+      ../../modules/nixos/gpg-ssh.nix
+      ../../modules/nixos/nix-ld.nix
+      ../../modules/nixos/steam.nix
+      ../../modules/nixos/vpn.nix
+      ../../modules/nixos/programs.nix
     ];
 
 

@@ -15,14 +15,14 @@
     nixosConfigurations.salad = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       modules = [
-        ./configuration.nix
+        ./hosts/salad/configuration.nix
 
         # home-manager nixos module
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.salad = import ./home.nix;
+          home-manager.users.salad = import ./home/salad.nix;
         }
 
         # pin cinnamon to stable
