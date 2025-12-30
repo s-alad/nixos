@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Import secrets from local gitignored file
   secrets = import ../../secrets.nix;
 in
 {
