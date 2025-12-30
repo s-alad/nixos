@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../modules/home-manager/git.nix
+  ];
+
   home.username = "salad";
   home.homeDirectory = "/home/salad";
 
