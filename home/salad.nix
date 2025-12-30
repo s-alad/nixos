@@ -14,7 +14,7 @@
 
   home.packages = with pkgs; [
     thunderbird
-    bottles
+    (bottles.override { removeWarningPopup = true; })
     discord
     slack
     claude-code
