@@ -27,8 +27,8 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
-  #boot.kernelPackages = pkgs.linuxPackages;  # stable 6.12 LTS (was linuxPackages_latest 6.18.2)
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest; # CachyOS with EEVDF scheduler
+  boot.kernelPackages = pkgs.linuxPackages;  # stable 6.12 LTS (was linuxPackages_latest 6.18.2)
+  #boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest; # CachyOS with EEVDF scheduler
   # --- explicit kernel modules
   boot.kernelModules = [ "kvm-intel" ];
   # --- silent boot
@@ -304,6 +304,30 @@ in
       ];
       trusted-users = [ "@wheel" ];
       auto-optimise-store = true;
+    };
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "eu.nixbuild.net";
+        system = "x86_64-linux";
+        maxJobs = 100;
+        supportedFeatures = [ "benchmark" "big-parallel" ];
+      }
+    ];
+  };
+
+  programs.ssh.extraConfig = ''
+    Host eu.nixbuild.net
+    PubkeyAcceptedKeyTypes ssh-ed25519
+    ServerAliveInterval 60
+    IPQoS throughput
+    IdentityFile /home/salad/.ssh/id_ed25519
+  '';
+
+  programs.ssh.knownHosts = {
+    nixbuild = {
+      hostNames = [ "eu.nixbuild.net" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
     };
   };
 
