@@ -27,7 +27,7 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages;  # stable 6.12 LTS (was linuxPackages_latest 6.18.2)
   # --- explicit kernel modules
   boot.kernelModules = [ "kvm-intel" ];
   # --- silent boot
