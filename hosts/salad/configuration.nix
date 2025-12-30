@@ -27,8 +27,8 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages;  # stable 6.12 LTS (was linuxPackages_latest 6.18.2)
-  #boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest; # CachyOS with EEVDF scheduler
+  #boot.kernelPackages = pkgs.linuxPackages;  # stable 6.12 LTS (was linuxPackages_latest 6.18.2)
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest; # CachyOS with EEVDF scheduler
   # --- explicit kernel modules
   boot.kernelModules = [ "kvm-intel" ];
   # --- silent boot
