@@ -5,6 +5,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,6 +18,17 @@
       specialArgs = {inherit inputs;};
       modules = [
         ./hosts/salad/configuration.nix
+
+        # CachyOS kernel overlay + selection + cache
+        ({ pkgs, ... }: {
+          nixpkgs.overlays = [
+            inputs.nix-cachyos-kernel.overlays.pinned
+          ];
+
+          nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
+          nix.settings.trusted-public-keys =
+            [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+        })
 
         # home-manager nixos module
         home-manager.nixosModules.home-manager
