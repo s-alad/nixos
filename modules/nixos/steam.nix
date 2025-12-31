@@ -19,5 +19,6 @@
   # Environment variables to fix Steam input handling on X11
   environment.sessionVariables = {
     SDL_VIDEODRIVER = "x11";
+    SDL_VIDEO_X11_DGAMOUSE = "0";
   };
 }
