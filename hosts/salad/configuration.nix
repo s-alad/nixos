@@ -279,6 +279,7 @@ in
     dysk
     baobab
     w3m
+    unzip
     gruvbox-gtk-theme
     arc-theme
     nordic
