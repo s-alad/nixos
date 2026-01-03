@@ -45,6 +45,8 @@
     android-studio
     watchman
     mapscii
+    monero-cli
+    monero-gui
   ];
 
   # --- home manager self management
