@@ -47,6 +47,7 @@
     mapscii
     monero-cli
     monero-gui
+    framesh
   ];
 
   # --- home manager self management
