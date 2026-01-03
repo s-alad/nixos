@@ -280,6 +280,7 @@ in
     baobab
     w3m
     unzip
+    p7zip
     gruvbox-gtk-theme
     arc-theme
     nordic
