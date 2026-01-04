@@ -52,14 +52,6 @@
     framesh
   ];
 
-  # --- XDG user directories
-  home.sessionVariables = {
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_DATA_HOME   = "$HOME/.local/share";
-    XDG_STATE_HOME  = "$HOME/.local/state";
-    XDG_CACHE_HOME  = "$HOME/.cache";
-  };
-
   # --- home manager self management
   programs.home-manager.enable = true;
 }
