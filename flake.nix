@@ -36,6 +36,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.salad = import ./home/salad.nix;
+          home-manager.backupFileExtension = "backup";
         }
 
         # pin cinnamon to stable

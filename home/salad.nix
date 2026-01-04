@@ -11,6 +11,13 @@
 
   xdg.enable = true;
 
+  # --- home manager zsh needed - main zsh is system wide - nixos/zsh.nix
+  programs.zsh = {
+    enable = true;
+    dotDir = "${config.xdg.configHome}/zsh";  # XDG-compliant location
+  };
+
+
   # --- home manager state version
   home.stateVersion = "25.11";
 
