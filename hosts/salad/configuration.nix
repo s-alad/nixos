@@ -20,6 +20,7 @@ in
       ../../modules/nixos/steam.nix
       ../../modules/nixos/vpn.nix
       ../../modules/nixos/programs.nix
+      ../../modules/nixos/yubikey.nix
     ];
 
 
