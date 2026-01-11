@@ -23,6 +23,9 @@
         ({ pkgs, ... }: {
           nixpkgs.overlays = [
             inputs.nix-cachyos-kernel.overlays.pinned
+            (final: prev: {
+              linux-firmware = nixpkgs-stable.legacyPackages.${prev.system}.linux-firmware;
+            })
           ];
 
           nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
