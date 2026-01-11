@@ -23,6 +23,8 @@
         ({ pkgs, ... }: {
           nixpkgs.overlays = [
             inputs.nix-cachyos-kernel.overlays.pinned
+
+            # pin linux-firmware to stable to avoid issues with iwlwifi crashes
             (final: prev: {
               linux-firmware = nixpkgs-stable.legacyPackages.${prev.system}.linux-firmware;
             })
