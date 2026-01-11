@@ -311,7 +311,7 @@ in
       trusted-users = [ "@wheel" ];
       auto-optimise-store = true;
     };
-    distributedBuilds = true;
+    distributedBuilds = false;
     buildMachines = [
       {
         hostName = "eu.nixbuild.net";
