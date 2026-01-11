@@ -297,6 +297,7 @@ in
     nvitop
     devenv
     direnv
+    codex
   ];
 
 
