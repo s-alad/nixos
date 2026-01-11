@@ -10,8 +10,8 @@
     package = pkgs.jdk;
   };
 
-  # --- android debug bridge
-  programs.adb.enable = true;
+  # --- android debug bridge (android-tools added to system packages)
+  # programs.adb is no longer needed - systemd 258 handles uaccess rules automatically
 
   # --- wireshark with packet capture capabilities
   programs.wireshark.enable = true;
