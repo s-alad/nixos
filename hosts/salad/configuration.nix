@@ -292,6 +292,7 @@ in
     oceanic-theme
     gruvterial-theme
     android-tools  # adb - systemd 258 handles uaccess rules automatically
+    glow
   ];
 
 
