@@ -76,6 +76,7 @@ in
   networking.hostName = "salad";
   # --- enable networking
   networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.powersave = false;
   # --- firewall
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
@@ -295,6 +296,7 @@ in
     glow
     nvitop
     devenv
+    direnv
   ];
 
 
