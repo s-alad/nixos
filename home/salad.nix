@@ -23,6 +23,10 @@
     config.global.hide_env_diff = true;
   };
 
+  home.sessionVariables = {
+    DIRENV_LOG_FORMAT = "";
+  };
+
 
   # --- home manager state version
   home.stateVersion = "25.11";
