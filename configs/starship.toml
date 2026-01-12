@@ -1,7 +1,7 @@
 # ~/.config/starship.toml
 
 # format = """$time $status$sudo $username[@](cyan)$hostname $directory $character"""
-format = """ $status$sudo $username[@](bright-green)$hostname $directory $character"""
+format = """ $status$sudo $username[@](bright-green)$hostname $directory$env_var $character"""
 
 #right_format = """$localip $git_branch$git_commit$git_status$git_metrics - $all"""
 right_format = """$git_branch$git_commit$git_status$git_metrics"""
@@ -269,3 +269,10 @@ format = '\[[$symbol($version)]($style)\]'
 
 [solidity]
 format = '\[[$symbol($version)]($style)\]'
+
+[env_var.DEVENV_ROOT]
+variable = 'DEVENV_ROOT'
+style = 'cyan'
+format = ' [\(devenv\)]($style)'
+default = ''
+disabled = false

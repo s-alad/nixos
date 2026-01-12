@@ -16,6 +16,11 @@
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";  # XDG-compliant location
   };
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
 
 
   # --- home manager state version
