@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -e
+
+echo " ▸ Creating devenv scaffold..."
+
+# Create .nixdev directory
+mkdir -p .nixdev
+
+# Create .envrc
+cat > .envrc << 'EOF'
+#!/usr/bin/env bash
+cd .nixdev || exit
+eval "$(devenv direnvrc)"
+use devenv --quiet
+cd ..
+EOF
+
+# Create devenv.yaml
+cat > .nixdev/devenv.yaml << 'EOF'
+# yaml-language-server: $schema=https://devenv.sh/devenv.schema.json
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling
+
+# If you're using non-OSS software, you can set allowUnfree to true.
+# allowUnfree: true
+
+# If you're willing to use a package that's vulnerable
+# permittedInsecurePackages:
+#  - "openssl-1.1.1w"
+
+# If you have more than one devenv you can merge them
+#imports:
+# - ./backend
+EOF
+
+# Create devenv.nix
+cat > .nixdev/devenv.nix << 'EOF'
+{ pkgs, lib, config, inputs, ... }:
+
+{
+  # https://devenv.sh/basics/
+  env.GREET = "devenv";
+
+  # https://devenv.sh/packages/
+  packages = [
+    pkgs.git
+    pkgs.nodejs_latest
+    pkgs.nodePackages.typescript
+  ];
+
+  # https://devenv.sh/languages/
+  # languages.rust.enable = true;
+  languages.javascript.enable = true;
+  languages.javascript.package = pkgs.nodejs_latest;
+  languages.javascript.corepack.enable = true;
+  languages.typescript.enable = true;
+
+  # https://devenv.sh/processes/
+  # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
+
+  # https://devenv.sh/services/
+  # services.postgres.enable = true;
+
+  # https://devenv.sh/scripts/
+  scripts.hello.exec = ''
+    echo hello from $GREET
+  '';
+
+  # https://devenv.sh/basics/
+  enterShell = ''
+    echo " ▸ devenv online ◆ node $(node --version) · tsc $(tsc --version | cut -d' ' -f2) · git $(git --version | cut -d' ' -f3)"
+  '';
+
+  # https://devenv.sh/tasks/
+  # tasks = {
+  #   "myproj:setup".exec = "mytool build";
+  #   "devenv:enterShell".after = [ "myproj:setup" ];
+  # };
+
+  # https://devenv.sh/tests/
+  enterTest = ''
+    echo "Running tests"
+    git --version | grep --color=auto "${pkgs.git.version}"
+  '';
+
+  # https://devenv.sh/git-hooks/
+  # git-hooks.hooks.shellcheck.enable = true;
+
+  # See full reference at https://devenv.sh/reference/options/
+}
+EOF
+
+# Add to .gitignore if it exists, or create it
+if [ -f .gitignore ]; then
+  if ! grep -q ".nixdev/.devenv" .gitignore 2>/dev/null; then
+    cat >> .gitignore << 'EOF'
+
+# Devenv
+.nixdev/.devenv*
+.nixdev/devenv.lock
+.nixdev/devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+EOF
+  fi
+else
+  cat > .gitignore << 'EOF'
+# Devenv
+.nixdev/.devenv*
+.nixdev/devenv.lock
+.nixdev/devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+EOF
+fi
+
+# Allow direnv
+direnv allow
+
+echo " ▸ Done! Edit .nixdev/devenv.nix to customize."

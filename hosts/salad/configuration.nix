@@ -4,6 +4,7 @@
 let
   bg = import ../../lib/lightdm-background.nix { inherit pkgs; };
   nixai = (builtins.getFlake "github:olafkfreund/nix-ai-help").packages.${pkgs.system}.default;
+  devenv-init = pkgs.writeShellScriptBin "devenv-init" (builtins.readFile ../../scripts/devenv-init);
 in
 {
   imports =
@@ -297,6 +298,7 @@ in
     nvitop
     devenv
     direnv
+    devenv-init
     codex
   ];
 
