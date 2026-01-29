@@ -300,6 +300,7 @@ in
     direnv
     devenv-init
     codex
+    traceroute
   ];
 
 
