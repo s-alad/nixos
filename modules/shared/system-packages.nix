@@ -8,4 +8,16 @@ with pkgs; [
   eza       # aliased as ls/ll/la/lt
   zoxide    # aliased as cd
   fzf       # fuzzy finder
+
+  # --- dev tools
+  git
+  gh
+  go
+  jq
+  wget
+  gnumake
+  ripgrep
+  bat
+  neofetch
+  cowsay
 ]

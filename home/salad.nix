@@ -56,7 +56,6 @@
     libreoffice
     prismlauncher
     cbonsai
-    cowsay
     cmatrix
     sl
     oneko

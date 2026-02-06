@@ -226,13 +226,11 @@ in
 
   ##### PACKAGES
   environment.systemPackages = (import ../../modules/shared/system-packages.nix { inherit pkgs; }) ++ (with pkgs; [
-    wget
     efibootmgr
     pciutils
     usbutils
     btop-cuda
     htop
-    git
     mesa-demos
     vulkan-tools
     nvtopPackages.full
@@ -243,13 +241,11 @@ in
     gnome-software
     signal-desktop
     fuse2
-    neofetch
     fastfetch
     chafa
     file
     nodejs
     yarn
-    go
     vlc
     ocaml
     redis
@@ -259,20 +255,15 @@ in
     rustfmt
     clippy
     rust-analyzer
-    gh
     starship
-    ripgrep
     jdk
-    jq
     uv
     lm_sensors
-    gnumake
     gcc
     pkg-config
     flameshot
     syncthing
     seahorse
-    bat
     tmux
     ffmpeg
     dysk
