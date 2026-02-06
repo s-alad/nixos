@@ -9,7 +9,6 @@
     aileron
     atkinson-hyperlegible
     cantarell-fonts
-    adwaita-fonts
   ];
 
   # enable fontconfig for user-level font discovery

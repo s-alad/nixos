@@ -8,7 +8,7 @@
     signByDefault = true;
   };
 
-  programs.git.extraConfig = {
+  programs.git.settings = {
     gpg.format = "ssh";
     safe.directory = "/etc/nixos";
   };

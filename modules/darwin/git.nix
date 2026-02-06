@@ -8,7 +8,7 @@
     { path = "~/.config/gitsign/gitconfig"; }
   ];
 
-  programs.git.extraConfig = {
+  programs.git.settings = {
     core = {
       hooksPath = "/usr/local/dd/global_hooks";
       editor = "code --wait";

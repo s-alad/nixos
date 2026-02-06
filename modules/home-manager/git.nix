@@ -7,10 +7,11 @@ in
   programs.git = {
     enable = true;
 
-    userName = secrets.gitUserName;
-    userEmail = secrets.gitUserEmail;
-
-    extraConfig = {
+    settings = {
+      user = {
+        name = secrets.gitUserName;
+        email = secrets.gitUserEmail;
+      };
       init.defaultBranch = "main";
     };
   };
