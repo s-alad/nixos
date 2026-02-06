@@ -21,6 +21,9 @@
 
   xdg.enable = true;
 
+  # --- XDG-compliant zsh location (silences dotDir deprecation warning)
+  programs.zsh.dotDir = "${config.xdg.configHome}/zsh";
+
   # --- direnv + nix-direnv (same as NixOS)
   programs.direnv = {
     enable = true;

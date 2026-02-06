@@ -10,7 +10,7 @@
   # --- source corporate/Datadog zsh config after nix-managed config
   # Before first activation: extract corporate blocks from ~/.zshrc into this file.
   # Include everything EXCEPT oh-my-zsh setup and starship init (HM handles those).
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     if [[ -f "$HOME/.config/zsh/corporate.zsh" ]]; then
       source "$HOME/.config/zsh/corporate.zsh"
     fi
