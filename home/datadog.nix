@@ -41,9 +41,6 @@
       # --- macOS-only packages
     ]);
 
-  # --- backup conflicting dotfiles instead of failing
-  home.backupFileExtension = "backup";
-
   # --- home manager state version
   home.stateVersion = "25.11";
 
