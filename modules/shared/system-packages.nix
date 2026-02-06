@@ -9,6 +9,9 @@ with pkgs; [
   zoxide    # aliased as cd
   fzf       # fuzzy finder
 
+  # --- nix tools
+  nh
+
   # --- dev tools
   git
   gh

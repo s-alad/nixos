@@ -235,7 +235,6 @@ in
     vulkan-tools
     nvtopPackages.full
     vscode
-    nh
     helix
     libva-utils
     gnome-software
