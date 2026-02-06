@@ -23,4 +23,8 @@ with pkgs; [
   bat
   neofetch
   cowsay
+  tree
+  awscli2
+  kind
+  eksctl
 ]

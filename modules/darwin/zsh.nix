@@ -4,8 +4,8 @@
   # macOS-specific zsh overrides (base config in modules/home-manager/zsh.nix)
 
   programs.zsh.shellAliases = {
-    hms = "nh home switch ~/salad/nixos#datadog -- -b backup";
-    hmu = "nix flake update ~/salad/nixos && nh home switch ~/salad/nixos#datadog -- -b backup";
+    hms = "nh home switch ~/salad/nixos#datadog";
+    hmu = "nix flake update ~/salad/nixos && nh home switch ~/salad/nixos#datadog";
   };
 
   # --- source corporate/Datadog zsh config after nix-managed config

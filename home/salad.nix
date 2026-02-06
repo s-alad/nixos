@@ -51,7 +51,6 @@
     element-desktop
     gimp2
     google-cloud-sdk
-    awscli2
     gitfetch
     libreoffice
     prismlauncher
