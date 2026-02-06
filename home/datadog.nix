@@ -1,5 +1,6 @@
 { config, pkgs, lib, ... }:
 
+let secrets = import ../secrets.nix; in
 {
   imports = [
     # --- shared modules
@@ -16,8 +17,8 @@
   # --- allow unfree (standalone HM needs this explicitly)
   nixpkgs.config.allowUnfree = true;
 
-  home.username = "saad.naji";
-  home.homeDirectory = "/Users/saad.naji";
+  home.username = secrets.macUser;
+  home.homeDirectory = "/Users/${secrets.macUser}";
 
   xdg.enable = true;
 

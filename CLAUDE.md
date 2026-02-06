@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Multi-system Nix flake supporting:
 - **NixOS** (ThinkPad P1 Gen 8, hostname: `salad`, user: `salad`) — full NixOS + home-manager as NixOS module
-- **macOS** (Datadog work laptop, config: `datadog`, user: `saad.naji`) — standalone home-manager only (no nix-darwin, due to IT restrictions)
+- **macOS** (Datadog work laptop, config: `datadog`) — standalone home-manager only (no nix-darwin, due to IT restrictions). Username lives in `secrets.nix` (gitignored).
 
 Both machines share the same shell stack (zsh, starship, oh-my-zsh, eza, zoxide) via shared home-manager modules.
 
@@ -102,6 +102,7 @@ Gitignored. Each machine has its own copy with different values:
   gitUserName = "...";
   gitUserEmail = "...";
   gitSigningKey = "...";    # only used by NixOS (modules/nixos/home/git.nix)
+  macUser = "...";           # macOS username, used by home/datadog.nix
 }
 ```
 
@@ -124,7 +125,7 @@ Gitignored. Each machine has its own copy with different values:
 Before first `home-manager switch` on macOS:
 
 1. **Install Nix**: `curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install`
-2. **Create `secrets.nix`** with work identity (gitUserName, gitUserEmail, gitSigningKey)
+2. **Create `secrets.nix`** with work identity (gitUserName, gitUserEmail, gitSigningKey, macUser)
 3. **Track secrets.nix**: `git add --force --intent-to-add secrets.nix`
 4. **Extract corporate .zshrc** into `~/.config/zsh/corporate.zsh` (everything except oh-my-zsh setup and starship init)
 5. **Activate**: `nix run home-manager/master -- switch --flake ~/salad/nixos#datadog -b backup`
