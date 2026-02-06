@@ -42,6 +42,7 @@
     (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++
     (with pkgs; [
       # --- macOS-only packages
+      btop
     ]);
 
   # --- home manager state version

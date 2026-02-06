@@ -3,6 +3,9 @@
 with pkgs; [
   vim
   lolcat
+  cowsay
+  tree
+  tlrc
 
   # --- shell dependencies (required for zsh aliases and plugins to work)
   eza       # aliased as ls/ll/la/lt
@@ -22,9 +25,4 @@ with pkgs; [
   ripgrep
   bat
   neofetch
-  cowsay
-  tree
-  awscli2
-  kind
-  eksctl
 ]
