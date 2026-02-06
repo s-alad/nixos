@@ -50,7 +50,6 @@
     google-chrome
     element-desktop
     gimp2
-    google-cloud-sdk
     gitfetch
     libreoffice
     prismlauncher
