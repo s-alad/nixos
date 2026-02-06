@@ -53,5 +53,13 @@
         })
       ];
     };
+
+    # --- standalone home-manager for macOS work laptop (aarch64-darwin)
+    homeConfigurations."datadog" = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      modules = [
+        ./home/datadog.nix
+      ];
+    };
   };
 }

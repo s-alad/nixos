@@ -83,7 +83,7 @@
     battery_display="off"
     disk_display="off"
     image_backend="ascii"
-    image_source="/home/salad/.config/neofetch/ascii.txt"
+    image_source="${config.home.homeDirectory}/.config/neofetch/ascii.txt"
     ascii_distro="auto"
     ascii_colors=(distro)
     ascii_bold="on"

@@ -2,8 +2,14 @@
 
 {
   imports = [
-    ../modules/home-manager/git.nix
+    ../modules/home-manager/zsh.nix
+    ../modules/home-manager/starship.nix
     ../modules/home-manager/neofetch.nix
+    ../modules/home-manager/fonts.nix
+    ../modules/home-manager/git.nix
+    # --- NixOS-specific
+    ../modules/nixos/home/zsh.nix
+    ../modules/nixos/home/git.nix
   ];
 
   home.username = "salad";
@@ -11,11 +17,6 @@
 
   xdg.enable = true;
 
-  # --- home manager zsh needed - main zsh is system wide - nixos/zsh.nix
-  programs.zsh = {
-    enable = true;
-    dotDir = "${config.xdg.configHome}/zsh";  # XDG-compliant location
-  };
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
@@ -31,7 +32,7 @@
   # --- home manager state version
   home.stateVersion = "25.11";
 
-  home.packages = with pkgs; [
+  home.packages = (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     thunderbird
     (bottles.override { removeWarningPopup = true; })
     discord
@@ -59,7 +60,6 @@
     cmatrix
     sl
     oneko
-    lolcat
     unityhub
     android-studio
     watchman
@@ -67,7 +67,7 @@
     monero-cli
     monero-gui
     framesh
-  ];
+  ]);
 
   # --- home manager self management
   programs.home-manager.enable = true;

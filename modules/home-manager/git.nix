@@ -7,19 +7,11 @@ in
   programs.git = {
     enable = true;
 
-    signing = {
-      key = secrets.gitSigningKey;
-      signByDefault = true;
-    };
+    userName = secrets.gitUserName;
+    userEmail = secrets.gitUserEmail;
 
-    settings = {
-      user = {
-        name = secrets.gitUserName;
-        email = secrets.gitUserEmail;
-      };
+    extraConfig = {
       init.defaultBranch = "main";
-      gpg.format = "ssh";
-      safe.directory = "/etc/nixos";
     };
   };
 }

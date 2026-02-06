@@ -10,18 +10,18 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      ../../modules/nixos/locale.nix
-      ../../modules/nixos/fonts.nix
-      ../../modules/nixos/fingerprint.nix
-      ../../modules/nixos/containers.nix
-      ../../modules/nixos/zsh.nix
-      ../../modules/nixos/starship.nix
-      ../../modules/nixos/gpg-ssh.nix
-      ../../modules/nixos/nix-ld.nix
-      ../../modules/nixos/steam.nix
-      ../../modules/nixos/vpn.nix
-      ../../modules/nixos/programs.nix
-      ../../modules/nixos/yubikey.nix
+      ../../modules/nixos/system/locale.nix
+      ../../modules/nixos/system/fonts.nix
+      ../../modules/nixos/system/fingerprint.nix
+      ../../modules/nixos/system/containers.nix
+      ../../modules/nixos/system/zsh.nix
+      ../../modules/nixos/system/starship.nix
+      ../../modules/nixos/system/gpg-ssh.nix
+      ../../modules/nixos/system/nix-ld.nix
+      ../../modules/nixos/system/steam.nix
+      ../../modules/nixos/system/vpn.nix
+      ../../modules/nixos/system/programs.nix
+      ../../modules/nixos/system/yubikey.nix
     ];
 
 
@@ -225,8 +225,7 @@ in
 
 
   ##### PACKAGES
-  environment.systemPackages = with pkgs; [
-    vim
+  environment.systemPackages = (import ../../modules/shared/system-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     wget
     efibootmgr
     pciutils
@@ -270,9 +269,6 @@ in
     gnumake
     gcc
     pkg-config
-    eza
-    zoxide
-    fzf
     flameshot
     syncthing
     seahorse
@@ -301,7 +297,7 @@ in
     devenv-init
     codex
     traceroute
-  ];
+  ]);
 
 
   ##### NIXPKGS

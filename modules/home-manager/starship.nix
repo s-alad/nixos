@@ -4,7 +4,7 @@
   programs.starship = {
     enable = true;
 
-    # --- import starship config from /etc/nixos/configs/starship.toml
+    # --- import starship config from configs/starship.toml
     settings = lib.importTOML ../../configs/starship.toml;
   };
 }
