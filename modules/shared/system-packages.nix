@@ -22,6 +22,7 @@ with pkgs; [
   jq
   wget
   gnumake
+  gcc
   ripgrep
   bat
   neofetch

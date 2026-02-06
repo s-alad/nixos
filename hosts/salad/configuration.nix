@@ -258,7 +258,6 @@ in
     jdk
     uv
     lm_sensors
-    gcc
     pkg-config
     flameshot
     syncthing

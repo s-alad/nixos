@@ -43,6 +43,7 @@
     (with pkgs; [
       # --- macOS-only packages
       btop
+      gawk
     ]);
 
   # --- home manager state version
