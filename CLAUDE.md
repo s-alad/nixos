@@ -176,3 +176,7 @@ HM-installed fonts use fontconfig. macOS terminals (iTerm2, Terminal.app) use Co
 - NixOS system-level modules are in `modules/nixos/system/`, NixOS HM overrides are in `modules/nixos/home/` — don't mix them
 - Always verify nixpkgs package names with `nix eval nixpkgs#<name>.name` before adding (e.g., `helm` is NOT Kubernetes Helm — use `kubernetes-helm`)
 - Never add new packages without explicitly telling the user — only move existing ones
+
+## TODO
+
+- Eventually sanitize repo (rewrite git history to scrub PII from old commits via `git filter-repo`)
