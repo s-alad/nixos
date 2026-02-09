@@ -34,7 +34,7 @@
 
   home.packages = (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     thunderbird
-    (bottles.override { removeWarningPopup = true; })
+    # (bottles.override { removeWarningPopup = true; })
     discord
     slack
     claude-code
