@@ -7,6 +7,7 @@
     ../modules/home-manager/neofetch.nix
     ../modules/home-manager/fonts.nix
     ../modules/home-manager/git.nix
+    ../modules/home-manager/direnv.nix
     # --- NixOS-specific
     ../modules/nixos/home/zsh.nix
     ../modules/nixos/home/git.nix
@@ -16,18 +17,6 @@
   home.homeDirectory = "/home/salad";
 
   xdg.enable = true;
-
-  programs.direnv = {
-    enable = true;
-    enableZshIntegration = true;
-    nix-direnv.enable = true;
-    config.global.hide_env_diff = true;
-  };
-
-  home.sessionVariables = {
-    DIRENV_LOG_FORMAT = "";
-  };
-
 
   # --- home manager state version
   home.stateVersion = "25.11";

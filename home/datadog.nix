@@ -9,6 +9,7 @@ let secrets = import ../secrets.nix; in
     ../modules/home-manager/neofetch.nix
     ../modules/home-manager/fonts.nix
     ../modules/home-manager/git.nix
+    ../modules/home-manager/direnv.nix
     # --- macOS-specific
     ../modules/darwin/zsh.nix
     ../modules/darwin/git.nix
@@ -24,18 +25,6 @@ let secrets = import ../secrets.nix; in
 
   # --- XDG-compliant zsh location (silences dotDir deprecation warning)
   programs.zsh.dotDir = "${config.xdg.configHome}/zsh";
-
-  # --- direnv + nix-direnv (same as NixOS)
-  programs.direnv = {
-    enable = true;
-    enableZshIntegration = true;
-    nix-direnv.enable = true;
-    config.global.hide_env_diff = true;
-  };
-
-  home.sessionVariables = {
-    DIRENV_LOG_FORMAT = "";
-  };
 
   # --- shared packages (system-level on NixOS, user-level here)
   home.packages =
