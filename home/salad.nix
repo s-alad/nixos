@@ -35,7 +35,7 @@
     mongodb-compass
     obsidian
     postman
-    redisinsight
+    # redisinsight  # temporarily disabled - build broken in nixpkgs (missing nix-prefetch-git in sandbox)
     google-chrome
     element-desktop
     gimp2
@@ -53,6 +53,7 @@
     monero-cli
     monero-gui
     framesh
+    session-desktop
   ]);
 
   # --- home manager self management
