@@ -35,7 +35,7 @@
     mongodb-compass
     obsidian
     postman
-    # redisinsight  # temporarily disabled - build broken in nixpkgs (missing nix-prefetch-git in sandbox)
+    # redisinsight  # broken in nixpkgs - nix-prefetch-git missing in sandbox
     google-chrome
     element-desktop
     gimp2
