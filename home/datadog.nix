@@ -43,9 +43,12 @@ let secrets = import ../secrets.nix; in
       gawk
     ]);
 
-  # --- overwrite the Nix store symlink with a writable copy so that tools
-  # --- like dda that copy+overwrite starship.toml preserving permissions
-  # --- don't fail on the read-only Nix store source (mode 444).
+  # --- override the shared module's settings so HM doesn't create a read-only
+  # --- Nix store symlink for starship.toml. Instead, use an activation script
+  # --- to place a writable copy. This prevents tools like dda that
+  # --- copy+overwrite starship.toml (preserving permissions) from failing
+  # --- with PermissionError on the read-only Nix store source (mode 444).
+  programs.starship.settings = lib.mkForce {};
   home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     install -m 644 ${../configs/starship.toml} ${config.home.homeDirectory}/.config/starship.toml
   '';
