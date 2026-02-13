@@ -3,6 +3,7 @@
 {
   # --- GPG agent with SSH support
   programs.gnupg.agent = {
+    # - auto fetches pkgs; [gnupg] 
     enable = true;
     enableSSHSupport = true;
   };
