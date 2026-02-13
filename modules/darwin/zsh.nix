@@ -6,7 +6,12 @@
   programs.zsh.shellAliases = {
     hms = "nh home switch ~/salad/nixos -c datadog";
     hmu = "nix flake update ~/salad/nixos && nh home switch ~/salad/nixos -c datadog";
-    hmsb = "home-manager switch --flake ~/salad/nixos#datadog -b backup";  # use if Ansible rewrites .zshrc
+    hmb = "home-manager switch --flake ~/salad/nixos#datadog -b backup";  # use if Ansible rewrites .zshrc
+    dab = "dda inv agent.clean && dda inv rtloader.clean && dda inv agent.build";
+    gpu = "git push -u origin HEAD";
+    abd = "dda inv agent.build";
+    aru = "dda inv agent.run -c dev/dist";
+    sec = "./bin/agent/agent secret -c dev/dist/datadog.yaml";
   };
 
   # --- source corporate/Datadog zsh config after nix-managed config
