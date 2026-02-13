@@ -26,4 +26,5 @@ with pkgs; [
   ripgrep
   bat
   neofetch
+  pass
 ]
