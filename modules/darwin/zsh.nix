@@ -12,6 +12,7 @@
     abd = "dda inv agent.build";
     aru = "dda inv agent.run -c dev/dist";
     sec = "./bin/agent/agent secret -c dev/dist/datadog.yaml";
+    dog = "./bin/agent/agent -c dev/dist/datadog.yaml"
   };
 
   # --- source corporate/Datadog zsh config after nix-managed config
