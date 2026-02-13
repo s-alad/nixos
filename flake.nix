@@ -5,7 +5,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    # pinned to 6.18.4 - NVIDIA 580.x doesn't support 6.19 yet
+    # to update: change rev to a newer commit from https://github.com/xddxdd/nix-cachyos-kernel/commits/release
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=f620f05781bf69dba1c821be059113c9be79141b";
 
     home-manager = {
       url = "github:nix-community/home-manager";
