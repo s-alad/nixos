@@ -47,7 +47,7 @@ let secrets = import ../secrets.nix; in
   # --- like dda that copy+overwrite starship.toml preserving permissions
   # --- don't fail on the read-only Nix store source (mode 444).
   home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    install -m 644 ${../../configs/starship.toml} ${config.home.homeDirectory}/.config/starship.toml
+    install -m 644 ${../configs/starship.toml} ${config.home.homeDirectory}/.config/starship.toml
   '';
 
   # --- home manager state version
