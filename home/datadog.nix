@@ -43,6 +43,13 @@ let secrets = import ../secrets.nix; in
       gawk
     ]);
 
+  # --- overwrite the Nix store symlink with a writable copy so that tools
+  # --- like dda that copy+overwrite starship.toml preserving permissions
+  # --- don't fail on the read-only Nix store source (mode 444).
+  home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    install -m 644 ${../../configs/starship.toml} ${config.home.homeDirectory}/.config/starship.toml
+  '';
+
   # --- home manager state version
   home.stateVersion = "25.11";
 
