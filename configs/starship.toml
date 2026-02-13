@@ -1,5 +1,5 @@
 # ~/.config/starship.toml
-command_timeout = 1000
+command_timeout = 10000
 
 # format = """$time $status$sudo $username[@](cyan)$hostname $directory $character"""
 format = """ $status$sudo $username[@](bright-green)$hostname $directory$custom $character"""
