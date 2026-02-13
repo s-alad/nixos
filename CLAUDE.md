@@ -52,7 +52,8 @@ flake.nix                              # Two outputs: nixosConfigurations.salad 
 │   │   ├── starship.nix              # Prompt: imports configs/starship.toml
 │   │   ├── neofetch.nix              # Custom neofetch theme + ASCII art
 │   │   ├── fonts.nix                 # Nerd fonts (minus adwaita-fonts, Linux-only)
-│   │   └── git.nix                   # Shared git base (identity from secrets.nix, defaultBranch)
+│   │   ├── git.nix                   # Shared git base (identity from secrets.nix, defaultBranch)
+│   │   └── direnv.nix               # Shared direnv + nix-direnv config
 │   ├── nixos/
 │   │   ├── system/                    # NixOS system-level modules (imported by configuration.nix)
 │   │   │   ├── zsh.nix               # System shell registration (environment.shells)
@@ -156,13 +157,16 @@ Aggressively migrated from 175+ Homebrew packages. Remaining `brew leaves`:
 - `bash` — newer bash than macOS built-in
 - `fontconfig` — system lib dependency
 - All `datadog/tap/*` — corporate tools
-- All casks: `dd-*`, `dda`, `ddcall`, `ddr`, `ddtool`, `docker-desktop`, `font-hack-nerd-font`, etc.
+- `font-meslo-lg-nerd-font` — Nerd Font for Terminal.app (MesloLGS Nerd Font, size 14)
+- All `datadog/tap/*` casks and `dd-*`, `dda`, `ddcall`, `ddr`, `ddtool`, `docker-desktop`, `font-hack-nerd-font`, etc.
 
 **Moved to Nix:** bat, btop, cowsay, eza, fzf, gawk, gcc, gh, git, gnumake, go, jq, lolcat, neofetch, nh, ripgrep, tree, tlrc, vim, wget, zoxide, awscli2, azure-cli, bazelisk, eksctl, google-cloud-sdk, kind, kubectx, kubernetes-helm, skaffold
 
+**Still moveable:** `gnupg`, `pre-commit`, `pipx` (scfw depends on it — may need to stay), `pulumi` (verify not a Datadog fork)
+
 ## Fonts Caveat
 
-HM-installed fonts use fontconfig. macOS terminals (iTerm2, Terminal.app) use Core Text and won't see them. Keep Homebrew `font-hack-nerd-font` and set your terminal to use a Nerd Font (e.g., "Hack Nerd Font" or "Iosevka Nerd Font") for icons in eza/starship.
+HM-installed fonts use fontconfig. macOS terminals (Terminal.app, iTerm2) use Core Text and won't see them. Keep Nerd Fonts installed via Homebrew cask. Current setup: `font-meslo-lg-nerd-font` — Terminal.app set to "MesloLGS Nerd Font" size 14 (same look as the previous Meslo LG L Powerline font, but with full Nerd Font icon support for eza/starship).
 
 ## Important Notes
 
@@ -180,3 +184,10 @@ HM-installed fonts use fontconfig. macOS terminals (iTerm2, Terminal.app) use Co
 ## TODO
 
 - Eventually sanitize repo (rewrite git history to scrub PII from old commits via `git filter-repo`)
+- Share cross-platform CLI tools from NixOS to macOS (tmux, helix, glow, unzip, p7zip, fastfetch, uv, htop, ffmpeg, devenv, codex, chafa, w3m, dysk)
+- Share `devenv-init` script to macOS
+- Move remaining Homebrew packages to Nix (gnupg, pre-commit, pulumi)
+- Manage global gitignore declaratively via `programs.git.ignores`
+- Consider managing `gh` CLI config via `programs.gh`
+- Clean up duplicate Go version managers (`~/.g/` — Nix already provides Go)
+- Add `devShells` output to flake (nil + nixfmt for editing the flake itself)

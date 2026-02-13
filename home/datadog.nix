@@ -23,6 +23,13 @@ let secrets = import ../secrets.nix; in
 
   xdg.enable = true;
 
+  # --- tidy up dotfile clutter into XDG state dirs
+  home.sessionVariables = {
+    LESSHISTFILE = "${config.xdg.stateHome}/less/history";
+    NODE_REPL_HISTORY = "${config.xdg.stateHome}/node/history";
+    VIMINFOFILE = "${config.xdg.stateHome}/vim/viminfo";
+  };
+
   # --- XDG-compliant zsh location (silences dotDir deprecation warning)
   programs.zsh.dotDir = "${config.xdg.configHome}/zsh";
 
