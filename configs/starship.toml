@@ -1,4 +1,5 @@
 # ~/.config/starship.toml
+command_timeout = 1000
 
 # format = """$time $status$sudo $username[@](cyan)$hostname $directory $character"""
 format = """ $status$sudo $username[@](bright-green)$hostname $directory$custom $character"""
@@ -98,9 +99,6 @@ format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
 format = '\[[$symbol($version)]($style)\]'
 
 [c]
-format = '\[[$symbol($version(-$name))]($style)\]'
-
-[cpp]
 format = '\[[$symbol($version(-$name))]($style)\]'
 
 [cmake]
