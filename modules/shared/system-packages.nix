@@ -27,4 +27,5 @@ with pkgs; [
   bat
   neofetch
   pass
+  gnupg
 ]
