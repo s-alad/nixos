@@ -7,7 +7,7 @@
 
     # pinned to 6.18.4 - NVIDIA 580.x doesn't support 6.19 yet
     # to update: change rev to a newer commit from https://github.com/xddxdd/nix-cachyos-kernel/commits/release
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=f620f05781bf69dba1c821be059113c9be79141b";
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=ab815ddf2e7602f06451a1f723900afcf9ff7241";
 
     home-manager = {
       url = "github:nix-community/home-manager";
