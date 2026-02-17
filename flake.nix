@@ -46,27 +46,7 @@
           home-manager.backupFileExtension = "backup";
         }
 
-        # pin all cinnamon packages to stable
-        ({ ... }: let
-          stablePkgs = nixpkgs-stable.legacyPackages.x86_64-linux;
-          pinned = name: { inherit name; value = stablePkgs.${name}; };
-        in {
-          nixpkgs.overlays = [
-            (final: prev: builtins.listToAttrs (map pinned [
-              "cinnamon"
-              "cinnamon-common"
-              "cinnamon-control-center"
-              "cinnamon-desktop"
-              "cinnamon-gsettings-overrides"
-              "cinnamon-menus"
-              "cinnamon-screensaver"
-              "cinnamon-session"
-              "cinnamon-settings-daemon"
-              "cinnamon-translations"
-              "mint-y-icons"
-            ]))
-          ];
-        })
+        # cinnamon - using unstable (no pin)
       ];
     };
 
