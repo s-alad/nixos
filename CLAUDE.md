@@ -180,6 +180,8 @@ HM-installed fonts use fontconfig. macOS terminals (Terminal.app, iTerm2) use Co
 - NixOS system-level modules are in `modules/nixos/system/`, NixOS HM overrides are in `modules/nixos/home/` — don't mix them
 - Always verify nixpkgs package names with `nix eval nixpkgs#<name>.name` before adding (e.g., `helm` is NOT Kubernetes Helm — use `kubernetes-helm`)
 - Never add new packages without explicitly telling the user — only move existing ones
+- Cinnamon is **no longer pinned to stable** — runs from nixos-unstable. The old `packageOverrides` pin didn't catch individual top-level packages like `cinnamon-settings-daemon`.
+- **Backlight/brightness keys** require a polkit rule (`security.polkit.extraConfig`) because polkit 127 uses `realpath` for path comparison, breaking NixOS symlink paths for `csd-backlight-helper` via `pkexec`. See `configuration.nix`.
 
 ## TODO
 

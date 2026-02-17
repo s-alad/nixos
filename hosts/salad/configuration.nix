@@ -171,6 +171,16 @@ in
   ### SOUND with pipewire
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+  # --- backlight control: auto-authorize csd-backlight-helper via pkexec
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.policykit.exec" &&
+          action.lookup("program").indexOf("csd-backlight-helper") >= 0 &&
+          subject.isInGroup("video")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
   services.pipewire = {
     enable = true;
     alsa.enable = true;
