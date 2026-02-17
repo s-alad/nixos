@@ -49,19 +49,15 @@
         # pin cinnamon to stable
         ({ pkgs, ... }: let
           stablePkgs = nixpkgs-stable.legacyPackages.${pkgs.system};
+          cinnamonNames = builtins.filter
+            (name: builtins.substring 0 8 name == "cinnamon")
+            (builtins.attrNames stablePkgs);
+          cinnamonPkgs = builtins.listToAttrs (
+            map (name: { inherit name; value = stablePkgs.${name}; }) cinnamonNames
+          );
         in {
           nixpkgs.overlays = [
-            (final: prev: let
-              cinnamonPkgs = builtins.listToAttrs (
-                builtins.filter (x: x != null) (
-                  map (name:
-                    if builtins.substring 0 8 name == "cinnamon" && builtins.hasAttr name stablePkgs
-                    then { inherit name; value = stablePkgs.${name}; }
-                    else null
-                  ) (builtins.attrNames prev)
-                )
-              );
-            in cinnamonPkgs // {
+            (final: prev: cinnamonPkgs // {
               mint-y-icons = stablePkgs.mint-y-icons;
             })
           ];
