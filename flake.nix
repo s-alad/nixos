@@ -46,20 +46,25 @@
           home-manager.backupFileExtension = "backup";
         }
 
-        # pin cinnamon to stable
-        ({ pkgs, ... }: let
-          stablePkgs = nixpkgs-stable.legacyPackages.${pkgs.system};
-          cinnamonNames = builtins.filter
-            (name: builtins.substring 0 8 name == "cinnamon")
-            (builtins.attrNames stablePkgs);
-          cinnamonPkgs = builtins.listToAttrs (
-            map (name: { inherit name; value = stablePkgs.${name}; }) cinnamonNames
-          );
+        # pin all cinnamon packages to stable
+        ({ ... }: let
+          stablePkgs = nixpkgs-stable.legacyPackages.x86_64-linux;
+          pinned = name: { inherit name; value = stablePkgs.${name}; };
         in {
           nixpkgs.overlays = [
-            (final: prev: cinnamonPkgs // {
-              mint-y-icons = stablePkgs.mint-y-icons;
-            })
+            (final: prev: builtins.listToAttrs (map pinned [
+              "cinnamon"
+              "cinnamon-common"
+              "cinnamon-control-center"
+              "cinnamon-desktop"
+              "cinnamon-gsettings-overrides"
+              "cinnamon-menus"
+              "cinnamon-screensaver"
+              "cinnamon-session"
+              "cinnamon-settings-daemon"
+              "cinnamon-translations"
+              "mint-y-icons"
+            ]))
           ];
         })
       ];
