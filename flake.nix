@@ -47,11 +47,24 @@
         }
 
         # pin cinnamon to stable
-        ({ pkgs, ... }: {
-          nixpkgs.config.packageOverrides = pkgs: {
-            cinnamon = nixpkgs-stable.legacyPackages.${pkgs.system}.cinnamon;
-            mint-y-icons = nixpkgs-stable.legacyPackages.${pkgs.system}.mint-y-icons;
-          };
+        ({ pkgs, ... }: let
+          stablePkgs = nixpkgs-stable.legacyPackages.${pkgs.system};
+        in {
+          nixpkgs.overlays = [
+            (final: prev: let
+              cinnamonPkgs = builtins.listToAttrs (
+                builtins.filter (x: x != null) (
+                  map (name:
+                    if builtins.substring 0 8 name == "cinnamon" && builtins.hasAttr name stablePkgs
+                    then { inherit name; value = stablePkgs.${name}; }
+                    else null
+                  ) (builtins.attrNames prev)
+                )
+              );
+            in cinnamonPkgs // {
+              mint-y-icons = stablePkgs.mint-y-icons;
+            })
+          ];
         })
       ];
     };
