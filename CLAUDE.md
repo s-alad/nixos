@@ -182,6 +182,7 @@ HM-installed fonts use fontconfig. macOS terminals (Terminal.app, iTerm2) use Co
 - Never add new packages without explicitly telling the user — only move existing ones
 - Cinnamon is **no longer pinned to stable** — runs from nixos-unstable. The old `packageOverrides` pin didn't catch individual top-level packages like `cinnamon-settings-daemon`.
 - **Backlight/brightness keys** require a polkit rule (`security.polkit.extraConfig`) because polkit 127 uses `realpath` for path comparison, breaking NixOS symlink paths for `csd-backlight-helper` via `pkexec`. See `configuration.nix`.
+- **Cinnamon crash fix**: `grouped-window-list` applet has an upstream bug where `set_child(icon)` is called synchronously during muffin's `window-created` signal, causing a segfault when the Clutter actor tree is not yet stable. Patched locally at `~/.local/share/cinnamon/applets/grouped-window-list@cinnamon.org/appGroup.js` — defers `set_child()` to `GLib.idle_add()` and removes icon from existing parent before reparenting. After Cinnamon upgrades, verify the local copy still overrides correctly or re-copy and patch.
 
 ## TODO
 

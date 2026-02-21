@@ -10,4 +10,5 @@ with pkgs; [
   kubernetes-helm
   skaffold
   bazelisk
+  wrangler
 ]
