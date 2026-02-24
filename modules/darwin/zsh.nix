@@ -12,13 +12,14 @@
     abd = "dda inv agent.build";
     aru = "dda inv agent.run -c dev/dist";
     sec = "./bin/agent/agent secret -c dev/dist/datadog.yaml";
-    dog = "./bin/agent/agent -c dev/dist/datadog.yaml"
   };
 
   # --- source corporate/Datadog zsh config after nix-managed config
   # Before first activation: extract corporate blocks from ~/.zshrc into this file.
   # Include everything EXCEPT oh-my-zsh setup and starship init (HM handles those).
   programs.zsh.initContent = ''
+    dog() { ./bin/agent/agent "$@" -c dev/dist/datadog.yaml; }
+
     if [[ -f "$HOME/.config/zsh/corporate.zsh" ]]; then
       source "$HOME/.config/zsh/corporate.zsh"
     fi
