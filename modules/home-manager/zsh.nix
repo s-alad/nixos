@@ -29,6 +29,7 @@
         "npm"
         "ssh"
         "zoxide"
+        "pass"
         "aliases"
       ];
     };

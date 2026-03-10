@@ -4,10 +4,11 @@
   imports = [
     ../modules/home-manager/zsh.nix
     ../modules/home-manager/starship.nix
-    ../modules/home-manager/neofetch.nix
+    ../modules/home-manager/fastfetch.nix
     ../modules/home-manager/fonts.nix
     ../modules/home-manager/git.nix
     ../modules/home-manager/direnv.nix
+    ../modules/home-manager/pass.nix
     # --- NixOS-specific
     ../modules/nixos/home/zsh.nix
     ../modules/nixos/home/git.nix

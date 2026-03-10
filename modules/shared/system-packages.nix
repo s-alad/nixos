@@ -24,7 +24,6 @@ with pkgs; [
   gnumake
   ripgrep
   bat
-  neofetch
-  pass
+  fastfetch
   gnupg
 ]
