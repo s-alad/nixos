@@ -6,7 +6,7 @@
   programs.zsh.shellAliases = {
     hms = "nh home switch ~/salad/nixos -c datadog";
     hmu = "nix flake update ~/salad/nixos && nh home switch ~/salad/nixos -c datadog";
-    hmb = "home-manager switch --flake ~/salad/nixos#datadog -b backup";  # use if Ansible rewrites .zshrc
+    hmb = "home-manager switch --flake ~/salad/nixos#datadog -b backup";
     dab = "dda inv agent.clean && dda inv rtloader.clean && dda inv agent.build";
     gpu = "git push -u origin HEAD";
     abd = "dda inv agent.build";
@@ -22,6 +22,12 @@
 
     if [[ -f "$HOME/.config/zsh/corporate.zsh" ]]; then
       source "$HOME/.config/zsh/corporate.zsh"
+    fi
+
+    # Expose Nix PATH to macOS GUI apps (VS Code, etc.) so they can find
+    # binaries like go, git, etc. without needing to be launched from terminal.
+    if [[ -n "$TERM_PROGRAM" ]]; then
+      launchctl setenv PATH "$PATH"
     fi
   '';
 }
