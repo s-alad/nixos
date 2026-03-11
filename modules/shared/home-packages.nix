@@ -10,5 +10,6 @@ with pkgs; [
   kubernetes-helm
   skaffold
   bazelisk
+  buildifier
   wrangler
 ]

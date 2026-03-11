@@ -5,7 +5,7 @@
 
   programs.zsh.shellAliases = {
     hms = "nh home switch ~/salad/nixos -c datadog";
-    hmu = "nix flake update ~/salad/nixos && nh home switch ~/salad/nixos -c datadog";
+    hmu = "nix flake update --flake ~/salad/nixos && nh home switch ~/salad/nixos -c datadog";
     hmb = "home-manager switch --flake ~/salad/nixos#datadog -b backup";
     dab = "dda inv agent.clean && dda inv rtloader.clean && dda inv agent.build";
     gpu = "git push -u origin HEAD";
