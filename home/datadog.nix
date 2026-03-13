@@ -10,6 +10,7 @@ let secrets = import ../secrets.nix; in
     ../modules/home-manager/fonts.nix
     ../modules/home-manager/git.nix
     ../modules/home-manager/direnv.nix
+    ../modules/home-manager/pass.nix
     # --- macOS-specific
     ../modules/darwin/zsh.nix
     ../modules/darwin/git.nix
