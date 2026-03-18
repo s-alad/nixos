@@ -12,4 +12,6 @@ with pkgs; [
   bazelisk
   buildifier
   wrangler
+  nodejs
+  yarn
 ]
