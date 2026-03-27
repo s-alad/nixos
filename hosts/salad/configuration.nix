@@ -22,6 +22,7 @@ in
       ../../modules/nixos/system/vpn.nix
       ../../modules/nixos/system/programs.nix
       ../../modules/nixos/system/yubikey.nix
+      ../../modules/nixos/system/vanta.nix
     ];
 
 
