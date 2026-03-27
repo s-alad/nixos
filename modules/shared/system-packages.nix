@@ -26,4 +26,5 @@ with pkgs; [
   bat
   fastfetch
   gnupg
+  lsof
 ]
