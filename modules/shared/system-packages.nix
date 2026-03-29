@@ -27,4 +27,5 @@ with pkgs; [
   fastfetch
   gnupg
   lsof
+  mitmproxy
 ]
