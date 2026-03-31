@@ -75,5 +75,8 @@
     libxslt
     libxml2
     icu
+
+    # - misc (Android emulator)
+    libbsd
   ];
 }
