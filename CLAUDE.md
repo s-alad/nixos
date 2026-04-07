@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a NixOS 26.05 (Yarara) installation on a **Lenovo ThinkPad P1 Gen 8** workstation with the following key hardware:
 
 - **CPU**: Intel Core Ultra i9
-- **GPU**: NVIDIA RTX PRO 2000 Blackwell (driver 580.126.09 with CUDA 13.0, open kernel modules)
+- **GPU**: NVIDIA RTX PRO 2000 Blackwell (driver 595.58.03 with CUDA 13.2, open kernel modules)
 - **Graphics**: Hybrid Intel/NVIDIA setup with PRIME offload mode enabled
 - **Storage**: Dual SSD configuration
   - 2TB SSD running NIXOS
@@ -68,7 +68,7 @@ The system uses a hybrid approach:
 ```nix
 nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"
 nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11"
-nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=..." (pinned to specific commit for NVIDIA compat)
+nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release" (tracks release branch, locked via flake.lock)
 home-manager.url = "github:nix-community/home-manager" (active - NixOS module mode)
 ```
 
@@ -88,7 +88,7 @@ With flakes enabled, use these commands:
 # using nh (recommended)
 ns                    # nh os switch path:/etc/nixos (rebuild only, no updates)
 ua                    # update apps only (safe - excludes kernel)
-nu                    # nh os switch path:/etc/nixos -u (updates ALL inputs including kernel)
+nu                    # nh os switch path:/etc/nixos -u (updates ALL inputs including kernel -- check NVIDIA compat first)
 
 # traditional method (still works as fallback)
 sn                    # sudo nixos-rebuild switch
@@ -102,47 +102,43 @@ sudo nixos-rebuild switch --flake path:/etc/nixos#salad
 
 ### Update Strategy (IMPORTANT)
 
-The CachyOS kernel is **pinned** to a specific commit in `flake.nix` to prevent NVIDIA driver incompatibilities. The kernel input uses `?rev=COMMIT_SHA` so it won't change unless manually updated.
+The CachyOS kernel tracks the `release` branch in `flake.nix` and is locked to a specific commit via `flake.lock`. Running `nu` (which calls `nix flake update`) will update **all** inputs including the kernel.
 
 | Command | What it updates | When to use |
 |---------|-----------------|-------------|
 | `ns` | Nothing (uses locked versions) | After editing config, adding/removing packages |
-| `ua` | Apps only (nixpkgs, home-manager, nixpkgs-stable) | **Daily/weekly updates** - safe, won't break NVIDIA |
-| `nu` | Apps + NVIDIA driver (kernel stays pinned) | Safe because kernel is pinned; updates everything else |
+| `ua` | Apps only (nixpkgs, home-manager, nixpkgs-stable) | **Daily/weekly updates** - safe, won't touch kernel |
+| `nu` | **Everything** including kernel | When ready to update all inputs (check NVIDIA compat first) |
 
-**Why the kernel is pinned:**
+**NVIDIA compatibility risk:**
 - NVIDIA open kernel modules compile against kernel APIs
-- When CachyOS bumps to a new kernel (e.g., 6.19), NVIDIA may not support it yet
-- Pinning via `?rev=` in flake.nix means `nu` and `nix flake update` can't change the kernel
-- Apps and NVIDIA drivers (from nixpkgs) still update freely
+- A new CachyOS kernel bump may break the NVIDIA build if the driver hasn't been updated
+- `ua` is always safe because it explicitly excludes the kernel input
+- Before running `nu`, check that the latest kernel is compatible: if the build fails, your system stays on the previous working kernel
 
-**Updating the kernel (manual process):**
-1. Check latest available versions:
-   ```bash
-   # Check what the latest CachyOS release branch has
-   nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'
+**If a kernel update via `nu` breaks NVIDIA:**
+- The build fails before activation -- your running system is unaffected
+- Revert by editing `flake.lock` or re-pinning the kernel with `?rev=` in `flake.nix`:
+  ```nix
+  nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=KNOWN_GOOD_COMMIT";
+  ```
+- Then run `ns` to rebuild with the pinned kernel
 
-   # Check a specific commit's kernel version
-   nix eval --raw 'github:xddxdd/nix-cachyos-kernel?rev=COMMIT_SHA#packages.x86_64-linux.linux-cachyos-latest.version'
-   ```
+**Checking kernel versions:**
+```bash
+# What's currently locked in flake.lock
+uname -r
 
-2. Find commits at: https://github.com/xddxdd/nix-cachyos-kernel/commits/release
-   - Or fetch via API: `curl -s "https://api.github.com/repos/xddxdd/nix-cachyos-kernel/commits?sha=release&per_page=20" | jq -r '.[] | "\(.sha[:12]) \(.commit.committer.date[:10]) \(.commit.message | split("\n")[0])"'`
+# What the latest CachyOS release branch has
+nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'
 
-3. Update the rev in `/etc/nixos/flake.nix`:
-   ```nix
-   nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel?rev=NEW_COMMIT_SHA";
-   ```
+# Find commits
+curl -s "https://api.github.com/repos/xddxdd/nix-cachyos-kernel/commits?sha=release&per_page=20" | jq -r '.[] | "\(.sha[:12]) \(.commit.committer.date[:10]) \(.commit.message | split("\n")[0])"'
+```
 
-4. Run `ns` to rebuild with the new kernel
-
-**If a kernel update fails:**
-- Your system stays on the previous working kernel (builds fail before activation)
-- Just revert the rev in `flake.nix` back to the previous working commit
-
-**Current kernel status (as of Feb 2026):**
-- Running: 6.18.9-cachyos (pinned rev: `ab815ddf2e7602f06451a1f723900afcf9ff7241`)
-- Latest upstream: 6.19 (NVIDIA 580.x doesn't support it yet - `zone_device_page_init` API change)
+**Current kernel status (as of April 2026):**
+- Running: 6.19.10-cachyos
+- NVIDIA 595.58.03 supports kernel 6.19 -- no compatibility issues
 
 ### Secrets Management
 
@@ -293,7 +289,7 @@ The system uses **NVIDIA PRIME Offload Mode** (not Sync Mode) for better battery
 
 - Intel Arc Pro 140T iGPU: `PCI:0:2:0`
 - NVIDIA RTX PRO 2000 Blackwell GPU: `PCI:1:0:0`
-- Running NVIDIA driver 580.126.09 with open-source kernel modules
+- Running NVIDIA driver 595.58.03 with open-source kernel modules
 - Using Intel iHD for video acceleration (LIBVA_DRIVER_NAME="iHD")
 
 ### Graphics Testing
@@ -318,11 +314,10 @@ nvidia-smi
 ### Kernel and Drivers
 
 - **kernel**: CachyOS Latest (`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest`)
-  - Currently running 6.18.9-cachyos with EEVDF scheduler
+  - Currently running 6.19.10-cachyos with EEVDF scheduler
   - CachyOS kernel provides performance optimizations and latest scheduler improvements
-  - Kernel **pinned** via `?rev=` in `flake.nix` to avoid NVIDIA incompatibilities
-  - Pinned rev: `ab815ddf2e7602f06451a1f723900afcf9ff7241` (Feb 8, 2026)
-- **nvidia drivers**: 580.126.09 stable with open kernel modules
+  - Kernel tracks the `release` branch, locked via `flake.lock` (not pinned with `?rev=`)
+- **nvidia drivers**: 595.58.03 stable with open kernel modules
 - **intel microcode**: updates enabled
 - **wifi tuning**: `power_save=0 swcrypto=1 11n_disable=8` (for stability)
 
@@ -468,7 +463,7 @@ lspci | grep -i vga    # graphics card info
 - **timezone**: America/New_York
 - **locale**: en_US.UTF-8
 - **keyboard**: US layout
-- **system state version**: 26.05 (do not change without reading docs)
+- **system state version**: 25.11 (do not change without reading docs)
 - **nix settings**: flakes and nix-command enabled, trusted users include @wheel, auto-optimize-store enabled
 
 ## Boot Configuration
@@ -730,7 +725,7 @@ Configured in `/etc/nixos/modules/nixos/home/zsh.nix`:
 
 ```bash
 ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
-nu      # nh os switch path:/etc/nixos -u (update ALL inputs + rebuild)
+nu      # nh os switch path:/etc/nixos -u (update ALL inputs including kernel + rebuild)
 ua      # update apps only (safe - skips kernel input to avoid NVIDIA breakage)
 sn      # sudo nixos-rebuild switch (traditional fallback)
 un      # update channels + traditional rebuild
@@ -743,9 +738,8 @@ cd      # z (zoxide)
 
 **Recommended workflow:**
 - `ns` - after editing config
-- `ua` - regular updates (apps only, safe)
-- `nu` - safe with pinned kernel (updates apps + NVIDIA driver, kernel stays pinned)
-- To update kernel: manually change `?rev=` in `/etc/nixos/flake.nix`, then `ns`
+- `ua` - regular updates (apps only, safe -- excludes kernel)
+- `nu` - updates everything including kernel (check NVIDIA compat first)
 
 ## Optional/Disabled Features
 
@@ -764,7 +758,8 @@ some features are commented out in modules that can be enabled:
 ### CachyOS Kernel + NVIDIA
 - **Issue**: New kernel versions may not be supported by NVIDIA drivers yet
 - **Symptom**: Build fails with errors like `too few arguments to function 'zone_device_page_init'`
-- **Solution**: Use `ua` instead of `nu` for updates; kernel stays locked while apps update
+- **Current status**: NVIDIA 595.x supports kernel 6.19 -- no current issues
+- **If it breaks after `nu`**: Use `ua` for safe updates (excludes kernel), or pin the kernel with `?rev=` in `flake.nix`
 - **Check compatibility**: `nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'`
 
 ### Cinnamon Backlight / Brightness Keys
