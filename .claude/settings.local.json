@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:wiki.nixos.org)"
+      "WebFetch(domain:wiki.nixos.org)",
+      "Bash(du -sh /home/salad/.[!.]*)",
+      "Bash(journalctl -p err --since \"7 days ago\" --no-pager)",
+      "Bash(systemctl list-unit-files:*)",
+      "Bash(ps aux:*)",
+      "Bash(docker volume:*)",
+      "Bash(docker network:*)",
+      "Bash(du -sh /home/salad/.var/app/*/)",
+      "Bash(du -sh /home/salad/Downloads/*)",
+      "Bash(du -sh /home/salad/.android/*/)",
+      "Bash(find /home/salad -maxdepth 3 -name *.backup)"
     ]
   }
 }
