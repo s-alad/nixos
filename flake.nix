@@ -24,9 +24,11 @@
           nixpkgs.overlays = [
             inputs.nix-cachyos-kernel.overlays.pinned
 
-            # pin linux-firmware to stable to avoid issues with iwlwifi crashes
+            # pin linux-firmware + sof-firmware to stable to avoid iwlwifi crashes
+            # and SOF topology ABI mismatches with the pinned CachyOS kernel
             (final: prev: {
               linux-firmware = nixpkgs-stable.legacyPackages.${prev.system}.linux-firmware;
+              sof-firmware = nixpkgs-stable.legacyPackages.${prev.system}.sof-firmware;
             })
           ];
 
