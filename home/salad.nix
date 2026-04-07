@@ -56,7 +56,7 @@
     framesh
     session-desktop
     cloudflared
-    wrangler
+
   ]);
 
   # --- home manager self management

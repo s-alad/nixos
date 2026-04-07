@@ -14,7 +14,7 @@ in
       ../../modules/nixos/system/fingerprint.nix
       ../../modules/nixos/system/containers.nix
       ../../modules/nixos/system/zsh.nix
-      ../../modules/nixos/system/starship.nix
+
       ../../modules/nixos/system/gpg-ssh.nix
       ../../modules/nixos/system/nix-ld.nix
       ../../modules/nixos/system/steam.nix
@@ -257,8 +257,6 @@ in
     fastfetch
     chafa
     file
-    nodejs
-    yarn
     vlc
     ocaml
     redis
@@ -268,7 +266,8 @@ in
     rustfmt
     clippy
     rust-analyzer
-    starship
+    gopls
+
     jdk
     uv
     lm_sensors
