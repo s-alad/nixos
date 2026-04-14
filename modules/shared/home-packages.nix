@@ -14,4 +14,5 @@ with pkgs; [
   wrangler
   nodejs
   yarn
+  lazydocker
 ]
