@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
-let secrets = import ../secrets.nix; in
+let
+  secrets = import ../secrets.nix;
+  devenv-init = pkgs.writeShellScriptBin "devenv-init" (builtins.readFile ../scripts/devenv-init.sh);
+in
 {
   imports = [
     # --- shared modules
@@ -42,6 +45,7 @@ let secrets = import ../secrets.nix; in
       # --- macOS-only packages
       btop
       gawk
+      devenv-init
     ]);
 
   # --- override the shared module's settings so HM doesn't create a read-only

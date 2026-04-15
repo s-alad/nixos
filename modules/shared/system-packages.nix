@@ -14,6 +14,7 @@ with pkgs; [
 
   # --- nix tools
   nh
+  devenv
 
   # --- dev tools
   git
