@@ -319,7 +319,7 @@ nvidia-smi
   - Kernel tracks the `release` branch, locked via `flake.lock` (not pinned with `?rev=`)
 - **nvidia drivers**: 595.58.03 stable with open kernel modules
 - **intel microcode**: updates enabled
-- **wifi tuning**: `power_save=0 swcrypto=1 11n_disable=8` (for stability)
+- **wifi tuning**: `power_save=0 swcrypto=1 11n_disable=8 disable_11be=1` (for stability — 11be disabled due to BE201 firmware NMI crashes)
 
 **Available CachyOS kernel variants:**
 ```nix

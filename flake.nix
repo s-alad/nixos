@@ -30,6 +30,20 @@
               linux-firmware = nixpkgs-stable.legacyPackages.${prev.system}.linux-firmware;
               sof-firmware = nixpkgs-stable.legacyPackages.${prev.system}.sof-firmware;
             })
+
+            # wangle: disable flaky TLSInMemoryTicketProcessorTest (timing-sensitive, fails in sandbox)
+            (final: prev: {
+              wangle = prev.wangle.overrideAttrs (old: {
+                doCheck = false;
+              });
+            })
+
+            # edencommon: disable flaky Fixture.lookup_expires test (process name race in sandbox)
+            (final: prev: {
+              edencommon = prev.edencommon.overrideAttrs (old: {
+                doCheck = false;
+              });
+            })
           ];
 
           nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];

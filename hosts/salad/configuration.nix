@@ -22,6 +22,8 @@ in
       ../../modules/nixos/system/programs.nix
       ../../modules/nixos/system/yubikey.nix
       ../../modules/nixos/system/appimage.nix
+      ../../modules/nixos/system/tailscale.nix
+      ../../modules/nixos/system/wifi-offload-fix.nix
     ];
 
 
@@ -67,7 +69,7 @@ in
   boot.loader.timeout = 0;
   # --- wifi crash management
   boot.extraModprobeConfig = ''
-    options iwlwifi power_save=0 swcrypto=1 11n_disable=8
+    options iwlwifi power_save=0 swcrypto=1 11n_disable=8 disable_11be=1
   '';
   #####
 
@@ -215,8 +217,11 @@ in
   };
   # --- enable CUPS to print documents
   services.printing.enable = true;
-  # --- touchpad support (enabled default in most desktopManager)
-  # services.xserver.libinput.enable = true;
+  # --- touchpad support
+  services.libinput = {
+    enable = true;
+    touchpad.disableWhileTyping = false;
+  };
   # --- OpenSSH daemon ; inbound
   # services.openssh.enable = true;
   # --- mouse support in tty

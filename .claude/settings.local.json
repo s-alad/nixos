@@ -11,7 +11,24 @@
       "Bash(du -sh /home/salad/.var/app/*/)",
       "Bash(du -sh /home/salad/Downloads/*)",
       "Bash(du -sh /home/salad/.android/*/)",
-      "Bash(find /home/salad -maxdepth 3 -name *.backup)"
+      "Bash(find /home/salad -maxdepth 3 -name *.backup)",
+      "Bash(journalctl --since \"10 min ago\" --no-pager -p err)",
+      "Bash(dmesg --time-format iso)",
+      "Bash(journalctl --since \"10 min ago\" --no-pager)",
+      "Bash(journalctl --since \"15 min ago\" --no-pager)",
+      "Bash(sensors)",
+      "Bash(journalctl --since \"30 min ago\" --no-pager)",
+      "Bash(modinfo iwlwifi:*)",
+      "Bash(journalctl -b --no-pager)",
+      "Read(//sys/module/iwlwifi/parameters/**)",
+      "Read(//sys/module/iwlmvm/parameters/**)",
+      "Bash(iwconfig)",
+      "Bash(ip link:*)",
+      "Bash(journalctl -b --no-pager --since \"16:28:00\" --until \"16:30:30\")",
+      "Bash(journalctl -b --no-pager --since \"16:27:00\" --until \"16:28:32\")",
+      "Bash(nix eval:*)",
+      "Bash(lspci:*)",
+      "Bash(iw dev:*)"
     ]
   }
 }
