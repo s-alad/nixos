@@ -28,4 +28,5 @@ with pkgs; [
   gnupg
   lsof
   mitmproxy
+  postgresql
 ]

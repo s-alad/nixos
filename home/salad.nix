@@ -39,7 +39,7 @@
     # redisinsight  # broken in nixpkgs - nix-prefetch-git missing in sandbox
     google-chrome
     element-desktop
-    gimp2
+    gimp3
     gitfetch
     libreoffice
     prismlauncher
