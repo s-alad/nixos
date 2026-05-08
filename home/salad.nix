@@ -56,7 +56,7 @@
     framesh
     session-desktop
     cloudflared
-
+    telegram-desktop
   ]);
 
   # --- home manager self management
