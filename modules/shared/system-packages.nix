@@ -29,4 +29,5 @@ with pkgs; [
   lsof
   mitmproxy
   postgresql
+  xclip
 ]
