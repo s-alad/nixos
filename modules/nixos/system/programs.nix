@@ -27,6 +27,10 @@
   programs.nh = {
     enable = true;
     clean.enable = true;
+    # Keep 10 generations to match boot.loader.systemd-boot.configurationLimit = 10.
+    # Without this, `nh clean` defaults to --keep 1 and the weekly run prunes every
+    # rollback target, leaving a single generation (no boot-menu fallback after a bad rebuild).
+    clean.extraArgs = "--keep 10";
     flake = "/etc/nixos";
   };
 }

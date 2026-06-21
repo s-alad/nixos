@@ -28,7 +28,6 @@
         "kubectl"
         "npm"
         "ssh"
-        "zoxide"
         "pass"
         "aliases"
       ];
@@ -40,4 +39,19 @@
       ignoreAllDups = true;
     };
   };
+
+  # zoxide: explicit shell integration (provides `z`; `cd` is aliased to `z` above).
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  # fzf: interactive Ctrl-R (history search) / Ctrl-T (file insert) / ** completion.
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  # bat: declarative `cat` replacement.
+  programs.bat.enable = true;
 }

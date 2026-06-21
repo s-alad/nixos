@@ -139,10 +139,6 @@ in
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
   };
-  environment.interactiveShellInit = ''
-    export GOPATH="$HOME/.local/share/go"
-    export PATH="$PATH:$GOPATH/bin"
-  '';
   #####
 
 
@@ -253,7 +249,7 @@ in
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "salad";
-    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "adbusers" "wireshark" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "audio" "kvm" "docker" "wireshark" "gamemode" ];
     # packages moved to home-manager (home.nix)
   };
 
@@ -274,7 +270,6 @@ in
     gnome-software
     signal-desktop
     fuse2
-    fastfetch
     chafa
     file
     vlc
@@ -315,6 +310,7 @@ in
     glow
     nvitop
     direnv
+    devenv
     devenv-init
     codex
     traceroute

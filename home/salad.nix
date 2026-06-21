@@ -22,6 +22,13 @@
   # --- home manager state version
   home.stateVersion = "25.11";
 
+  # --- Go toolchain paths (moved from configuration.nix environment.interactiveShellInit)
+  home.sessionVariables.GOPATH = "${config.home.homeDirectory}/.local/share/go";
+  home.sessionPath = [ "${config.home.homeDirectory}/.local/share/go/bin" ];
+
+  # --- desktop wallpaper, reproducible from repo asset (was undeclared ~/Pictures/darkcarp.jpeg)
+  home.file."Pictures/darkcarp.jpeg".source = ../assets/darkcarpet.jpeg;
+
   home.packages = (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     thunderbird
     # (bottles.override { removeWarningPopup = true; })

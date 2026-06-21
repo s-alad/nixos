@@ -229,7 +229,7 @@ nix flake update /etc/nixos
 
 # garbage collection
 sudo nix-collect-garbage -d
-nh clean all --keep 5        # keep last 5 generations (with nh)
+nh clean all --keep 10       # keep last 10 generations (matches configured nh.clean policy)
 ```
 
 **Home-Manager mode:**
@@ -277,7 +277,7 @@ programs.zsh = {
 
 - **garbage collection**: managed by nh (clean.enable = true)
 - **auto-optimize store**: enabled for deduplication
-- **boot generations**: keeps last 10 configurations
+- **boot generations**: `nh.clean` keeps 10 (`clean.extraArgs = "--keep 10"`) to match systemd-boot `configurationLimit = 10` (without the explicit keep, nh defaults to `--keep 1` and removes all rollback targets)
 - **nix flakes**: enabled with version locking via flake.lock
 - **nh**: nix helper enabled for better rebuild experience
 
@@ -410,7 +410,7 @@ Some programs require `programs.<name>.enable` instead of just adding to package
 - **obs-studio**: `programs.obs-studio` - enables virtual camera (v4l2loopback) and CUDA encoding
 - **mullvad-vpn**: `services.mullvad-vpn` - runs as system service with systemd-resolved
 - **mozilla-vpn**: `services.mozillavpn` - mozilla vpn service
-- **adb**: `programs.adb.enable = true` - grants usb device access (user in adbusers group)
+- **adb**: provided by the `android-tools` package; `programs.adb` is intentionally disabled (systemd 258 uaccess udev rules grant USB device access automatically — no `adbusers` group needed)
 - **steam**: `programs.steam` - handles firewall configuration automatically
 - **gamemode**: `programs.gamemode.enable = true` - automatic performance optimizations when gaming (enabled)
 - **nh**: `programs.nh` - nix helper for better flake rebuild experience
@@ -458,7 +458,7 @@ lspci | grep -i vga    # graphics card info
 ## Important Notes
 
 - **unfree packages allowed**: `nixpkgs.config.allowUnfree = true`
-- **user**: salad (wheel, networkmanager, video, audio, kvm, docker, adbusers, wireshark groups)
+- **user**: salad (wheel, networkmanager, video, audio, kvm, docker, wireshark, gamemode groups)
 - **default shell**: zsh with oh-my-zsh, starship prompt, syntax highlighting, and autosuggestions
 - **timezone**: America/New_York
 - **locale**: en_US.UTF-8
@@ -698,7 +698,7 @@ adb shell
 adb logcat
 ```
 
-**note**: user 'salad' is in the `adbusers` group, which grants permission to use adb without root.
+**note**: adb works without root via the `android-tools` package + systemd 258 uaccess udev rules. `programs.adb` is disabled and there is no `adbusers` group (the udev rules tag the device for the logged-in seat instead).
 
 ### Android Studio
 
@@ -802,4 +802,4 @@ some features are commented out in modules that can be enabled:
 
 ## NEXT
 
-you may also read CONTEXT.md
+you may also read docs/CONTEXT.md (supporting docs live in docs/: CONTEXT.md, wifi.md, AUDIT.md)
