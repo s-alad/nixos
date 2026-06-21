@@ -34,6 +34,7 @@
     # (bottles.override { removeWarningPopup = true; })
     discord
     slack
+    opencode
     claude-code
     code-cursor
     brave
