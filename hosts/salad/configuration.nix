@@ -217,6 +217,10 @@ in
   # --- firmware updates
   services.fwupd.enable = true;
   # --- intel thermal management
+  # NOTE: thermald 2.5.x doesn't yet support Arrow Lake (Core Ultra 9 285H) — for now it
+  # logs "Unsupported cpu model or platform" and exits cleanly as a no-op (kernel HWP +
+  # firmware DPTF handle thermals). Kept enabled so it auto-activates once a thermald build
+  # adds 285H support; harmless until then.
   services.thermald.enable = true;
   # --- 
   services.fstrim.enable = true;
