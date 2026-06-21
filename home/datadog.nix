@@ -7,16 +7,16 @@ in
 {
   imports = [
     # --- shared modules
-    ../modules/home-manager/zsh.nix
-    ../modules/home-manager/starship.nix
-    ../modules/home-manager/fastfetch.nix
-    ../modules/home-manager/fonts.nix
-    ../modules/home-manager/git.nix
-    ../modules/home-manager/direnv.nix
-    ../modules/home-manager/pass.nix
+    ../modules/home/common/zsh.nix
+    ../modules/home/common/starship.nix
+    ../modules/home/common/fastfetch.nix
+    ../modules/home/common/fonts.nix
+    ../modules/home/common/git.nix
+    ../modules/home/common/direnv.nix
+    ../modules/home/common/pass.nix
     # --- macOS-specific
-    ../modules/darwin/zsh.nix
-    ../modules/darwin/git.nix
+    ../modules/home/darwin/zsh.nix
+    ../modules/home/darwin/git.nix
   ];
 
   # --- allow unfree (standalone HM needs this explicitly)
@@ -39,8 +39,8 @@ in
 
   # --- shared packages (system-level on NixOS, user-level here)
   home.packages =
-    (import ../modules/shared/system-packages.nix { inherit pkgs; }) ++
-    (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++
+    (import ../packages/system-packages.nix { inherit pkgs; }) ++
+    (import ../packages/home-packages.nix { inherit pkgs; }) ++
     (with pkgs; [
       # --- macOS-only packages
       btop

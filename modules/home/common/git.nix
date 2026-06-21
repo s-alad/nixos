@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  secrets = import ../../secrets.nix;
+  secrets = import ../../../secrets.nix;
 in
 {
   programs.git = {

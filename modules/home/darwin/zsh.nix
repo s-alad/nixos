@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  # macOS-specific zsh overrides (base config in modules/home-manager/zsh.nix)
+  # macOS-specific zsh overrides (base config in modules/home/common/zsh.nix)
 
   programs.zsh.shellAliases = {
     hms = "nh home switch ~/salad/nixos -c datadog";

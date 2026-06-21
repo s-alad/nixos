@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  # macOS-specific git overrides (shared config in modules/home-manager/git.nix)
+  # macOS-specific git overrides (shared config in modules/home/common/git.nix)
 
   # --- dd-gitsign handles signing via the included gitconfig
   programs.git.includes = [

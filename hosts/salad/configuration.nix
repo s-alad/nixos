@@ -9,21 +9,21 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      ../../modules/nixos/system/locale.nix
-      ../../modules/nixos/system/fonts.nix
-      ../../modules/nixos/system/fingerprint.nix
-      ../../modules/nixos/system/containers.nix
-      ../../modules/nixos/system/zsh.nix
+      ../../modules/system/locale.nix
+      ../../modules/system/fonts.nix
+      ../../modules/system/fingerprint.nix
+      ../../modules/system/containers.nix
+      ../../modules/system/zsh.nix
 
-      ../../modules/nixos/system/gpg-ssh.nix
-      ../../modules/nixos/system/nix-ld.nix
-      ../../modules/nixos/system/steam.nix
-      ../../modules/nixos/system/vpn.nix
-      ../../modules/nixos/system/programs.nix
-      ../../modules/nixos/system/yubikey.nix
-      ../../modules/nixos/system/appimage.nix
-      ../../modules/nixos/system/tailscale.nix
-      ../../modules/nixos/system/wifi-offload-fix.nix
+      ../../modules/system/gpg-ssh.nix
+      ../../modules/system/nix-ld.nix
+      ../../modules/system/steam.nix
+      ../../modules/system/vpn.nix
+      ../../modules/system/programs.nix
+      ../../modules/system/yubikey.nix
+      ../../modules/system/appimage.nix
+      ../../modules/system/tailscale.nix
+      ../../modules/system/wifi-offload-fix.nix
     ];
 
 
@@ -255,7 +255,7 @@ in
 
 
   ##### PACKAGES
-  environment.systemPackages = (import ../../modules/shared/system-packages.nix { inherit pkgs; }) ++ (with pkgs; [
+  environment.systemPackages = (import ../../packages/system-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     efibootmgr
     pciutils
     usbutils

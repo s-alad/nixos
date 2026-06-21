@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  # NixOS-specific zsh overrides (base config in modules/home-manager/zsh.nix)
+  # NixOS-specific zsh overrides (base config in modules/home/common/zsh.nix)
 
   programs.zsh.dotDir = "${config.xdg.configHome}/zsh";  # XDG-compliant location
 

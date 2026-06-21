@@ -2,3 +2,7 @@ result
 result-*
 secrets.nix
 AUDIT.md
+
+# editor / agent local settings (machine-specific, not shared)
+.vscode/
+.claude/

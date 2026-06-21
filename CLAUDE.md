@@ -24,37 +24,62 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 
 ```
 /etc/nixos/
-├── flake.nix                   (flake definition with inputs/outputs)
+├── flake.nix                   (inputs/outputs: nixosConfigurations.salad + homeConfigurations.datadog + formatter/checks/devShells.default)
 ├── flake.lock                  (locked package versions)
 ├── secrets.nix                 (gitignored secrets file)
 ├── compare.sh                  (script to verify config changes)
+├── CLAUDE.md                   (this file)
 ├── hosts/
-│   └── salad/
-│       ├── configuration.nix   (main system config)
+│   └── salad/                  (the ONLY NixOS host; datadog is standalone home-manager, not a NixOS host)
+│       ├── configuration.nix   (main system config; imports modules/system/*)
 │       └── hardware-configuration.nix (auto-generated, do not edit)
-├── home/
-│   └── salad.nix              (home-manager user configuration)
-├── configs/
-│   └── starship.toml          (starship prompt configuration)
+├── home/                       (home-manager entrypoints, keyed by config name)
+│   ├── salad.nix              (NixOS user; pulled in via home-manager.users.salad in flake.nix)
+│   └── datadog.nix            (standalone home-manager for the aarch64-darwin work Mac)
+├── packages/                   (raw `{ pkgs }:` package LISTS — data, not modules)
+│   ├── system-packages.nix    (environment.systemPackages list)
+│   └── home-packages.nix      (home.packages list)
+├── configs/                    (starship.toml, fastfetch.jsonc, fastfetch-ascii.txt)
 ├── assets/
 │   └── darkcarpet.jpeg        (lightdm background image)
 ├── lib/
 │   └── lightdm-background.nix (image processor/builder)
+├── overlays/
+│   └── failure.nix            (workarounds for broken-on-unstable packages)
+├── scripts/
+│   └── devenv-init.sh         (devShell init script)
+├── docs/                       (CONTEXT.md, wifi.md, AUDIT.md)
 └── modules/
-    ├── nixos/                 (system-level modules)
+    ├── system/                (NixOS SYSTEM modules — imported by hosts/salad/configuration.nix)
+    │   ├── appimage.nix       (appimage runtime support)
     │   ├── containers.nix     (docker/podman)
     │   ├── fingerprint.nix    (fingerprint auth & pam)
     │   ├── fonts.nix          (system fonts)
     │   ├── gpg-ssh.nix        (gpg agent with ssh support)
     │   ├── locale.nix         (timezone & internationalization)
-    │   ├── vpn.nix            (mullvad & mozilla vpn services)
     │   ├── nix-ld.nix         (libraries for prebuilt binaries)
     │   ├── programs.nix       (firefox, java, adb, wireshark, obs, nh)
-    │   ├── starship.nix       (starship prompt)
     │   ├── steam.nix          (steam & gamemode)
-    │   └── zsh.nix            (zsh shell configuration)
-    └── home-manager/          (user-level modules)
-        └── git.nix            (git configuration using secrets.nix)
+    │   ├── tailscale.nix      (tailscale mesh vpn)
+    │   ├── vpn.nix            (mullvad & mozilla vpn services)
+    │   ├── wifi-offload-fix.nix (BE201 wifi offload workaround)
+    │   ├── yubikey.nix        (yubikey fido2/u2f support)
+    │   └── zsh.nix            (system-level zsh shell configuration)
+    └── home/                  (home-manager modules, split by role)
+        ├── common/            (cross-platform BASE — imported by BOTH salad and datadog)
+        │   ├── direnv.nix
+        │   ├── fastfetch.nix
+        │   ├── fonts.nix
+        │   ├── git.nix        (base git config using secrets.nix)
+        │   ├── pass.nix
+        │   ├── starship.nix
+        │   └── zsh.nix
+        ├── linux/             (NixOS-only HM OVERRIDES — git signing, ns/nu/ua rebuild aliases)
+        │   ├── git.nix
+        │   └── zsh.nix
+        └── darwin/            (macOS-only HM OVERRIDES)
+            ├── git.nix
+            └── zsh.nix
 ```
 
 ### Flake Configuration
@@ -176,7 +201,7 @@ in
 - Any module can import and use values from `secrets.nix`
 
 **Current usage:**
-- Git configuration: username, email, and signing key (`modules/home-manager/git.nix`)
+- Git configuration: username, email, and signing key (`modules/home/common/git.nix`, with NixOS overrides in `modules/home/linux/git.nix`)
 
 ### Verifying Configuration Changes
 
@@ -269,7 +294,7 @@ programs.zsh = {
 
 **Shell integration:**
 - Home-manager manages zsh via `programs.zsh.enable = true`
-- System-level zsh config (`/etc/nixos/modules/nixos/zsh.nix`) still applies
+- System-level zsh config (`/etc/nixos/modules/system/zsh.nix`) still applies
 - Session variables automatically sourced via home-manager
 - Both system and user configs coexist peacefully
 
@@ -360,7 +385,7 @@ pkgs.cachyosKernels.linuxPackages-cachyos-hardened # security-hardened
 
 ### Running Non-NixOS Binaries
 
-The system has `nix-ld` configured with extensive libraries for running prebuilt binaries (see `/etc/nixos/modules/nix-ld.nix`):
+The system has `nix-ld` configured with extensive libraries for running prebuilt binaries (see `/etc/nixos/modules/system/nix-ld.nix`):
 
 **Core Libraries**: fuse2, stdenv.cc, zlib, openssl, glib, gtk3, nss, nspr, pulseaudio, dbus, alsa-lib
 
@@ -415,7 +440,7 @@ Some programs require `programs.<name>.enable` instead of just adding to package
 - **gamemode**: `programs.gamemode.enable = true` - automatic performance optimizations when gaming (enabled)
 - **nh**: `programs.nh` - nix helper for better flake rebuild experience
 
-These are configured in `/etc/nixos/modules/programs.nix`, `/etc/nixos/modules/steam.nix`, and `/etc/nixos/modules/vpn.nix`.
+These are configured in `/etc/nixos/modules/system/programs.nix`, `/etc/nixos/modules/system/steam.nix`, and `/etc/nixos/modules/system/vpn.nix`.
 
 ## Common Tasks
 
@@ -429,9 +454,11 @@ These are configured in `/etc/nixos/modules/programs.nix`, `/etc/nixos/modules/s
 
 ### Adding a Module
 
-1. create `/etc/nixos/modules/newmodule.nix`
-2. add `./modules/newmodule.nix` to imports in `configuration.nix`
+1. create a NixOS system module at `/etc/nixos/modules/system/newmodule.nix`
+2. add `../../modules/system/newmodule.nix` to the imports list in `hosts/salad/configuration.nix` (the import path uses `../../` from `hosts/salad/`)
 3. rebuild: `ns`
+
+For home-manager modules: add a cross-platform module under `modules/home/common/`, or a platform-specific override under `modules/home/linux/` or `modules/home/darwin/`, then import it from the relevant entrypoint (`home/salad.nix` or `home/datadog.nix`).
 
 ### Updating System
 
@@ -594,7 +621,7 @@ lsusb | grep synaptics
 
 **to disable fingerprint authentication:**
 
-edit `/etc/nixos/modules/fingerprint.nix` and comment out or rebuild without importing it.
+edit `/etc/nixos/modules/system/fingerprint.nix` and comment out or rebuild without importing it.
 
 ## YubiKey
 
@@ -602,7 +629,7 @@ edit `/etc/nixos/modules/fingerprint.nix` and comment out or rebuild without imp
 
 - **device**: YubiKey (FIDO2/U2F)
 - **status**: **enabled** for web authentication
-- **location**: `/etc/nixos/modules/nixos/yubikey.nix`
+- **location**: `/etc/nixos/modules/system/yubikey.nix`
 
 ### Current Configuration
 
@@ -653,7 +680,7 @@ ssh-keygen -t ed25519-sk -O resident -O application=ssh:mykey
 ### Steam
 
 - **status**: enabled with remote play and dedicated server firewall ports
-- **location**: `/etc/nixos/modules/steam.nix`
+- **location**: `/etc/nixos/modules/system/steam.nix`
 - **proton-ge**: installed via `extraCompatPackages` for better compatibility and performance
 - **input fix**: SDL environment variables configured to fix X11 click/input issues
   - `SDL_VIDEODRIVER=x11` - forces SDL2 to use X11 backend
@@ -721,7 +748,7 @@ watchman is installed for react native file watching and hot reload functionalit
 
 ## Shell Aliases
 
-Configured in `/etc/nixos/modules/nixos/home/zsh.nix`:
+Configured in `/etc/nixos/modules/home/linux/zsh.nix`:
 
 ```bash
 ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
@@ -747,7 +774,7 @@ some features are commented out in modules that can be enabled:
 
 1. **ssh server**: uncomment in configuration.nix for inbound ssh access
 2. **alternative desktop environments**: gnome or kde plasma 6 (commented in configuration.nix)
-3. **podman**: in `/etc/nixos/modules/containers.nix` - alternative to docker
+3. **podman**: in `/etc/nixos/modules/system/containers.nix` - alternative to docker
 
 ## Known Issues / Workarounds
 

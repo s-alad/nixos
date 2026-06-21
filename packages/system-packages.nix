@@ -26,7 +26,7 @@ with pkgs; [
   ripgrep
   bat
   fastfetch
-  # gnupg provided by programs.gnupg.agent (modules/nixos/system/gpg-ssh.nix)
+  # gnupg provided by programs.gnupg.agent (modules/system/gpg-ssh.nix)
   lsof
   mitmproxy
   postgresql

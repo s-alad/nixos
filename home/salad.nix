@@ -2,16 +2,16 @@
 
 {
   imports = [
-    ../modules/home-manager/zsh.nix
-    ../modules/home-manager/starship.nix
-    ../modules/home-manager/fastfetch.nix
-    ../modules/home-manager/fonts.nix
-    ../modules/home-manager/git.nix
-    ../modules/home-manager/direnv.nix
-    ../modules/home-manager/pass.nix
+    ../modules/home/common/zsh.nix
+    ../modules/home/common/starship.nix
+    ../modules/home/common/fastfetch.nix
+    ../modules/home/common/fonts.nix
+    ../modules/home/common/git.nix
+    ../modules/home/common/direnv.nix
+    ../modules/home/common/pass.nix
     # --- NixOS-specific
-    ../modules/nixos/home/zsh.nix
-    ../modules/nixos/home/git.nix
+    ../modules/home/linux/zsh.nix
+    ../modules/home/linux/git.nix
   ];
 
   home.username = "salad";
@@ -29,7 +29,7 @@
   # --- desktop wallpaper, reproducible from repo asset (was undeclared ~/Pictures/darkcarp.jpeg)
   home.file."Pictures/darkcarp.jpeg".source = ../assets/darkcarpet.jpeg;
 
-  home.packages = (import ../modules/shared/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
+  home.packages = (import ../packages/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     thunderbird
     # (bottles.override { removeWarningPopup = true; })
     discord

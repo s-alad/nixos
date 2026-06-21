@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  # NixOS-specific git overrides (base config in modules/home-manager/git.nix)
+  # NixOS-specific git overrides (base config in modules/home/common/git.nix)
 
   programs.git.signing = {
     key = (import ../../../secrets.nix).gitSigningKey;
