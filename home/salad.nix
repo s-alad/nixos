@@ -33,6 +33,7 @@
     thunderbird
     # (bottles.override { removeWarningPopup = true; })
     discord
+    stremio-linux-shell
     slack
     opencode
     claude-code
