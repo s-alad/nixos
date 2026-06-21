@@ -205,7 +205,7 @@ in
     pulse.enable = true;
   };
   # --- flatpak
-  services.flatpak.enable = true;
+  services.flatpak.enable = false;
   # --- 
   services.power-profiles-daemon.enable = true;
   # --- system wide power management
