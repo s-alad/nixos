@@ -14,8 +14,8 @@
   # firmware timeouts, SW resets, and stuck queues on the Intel Wi-Fi 7 BE201.
   # Also avoids SOF topology ABI mismatches with the pinned CachyOS kernel.
   (final: prev: {
-    linux-firmware = nixpkgs-stable.legacyPackages.${prev.system}.linux-firmware;
-    sof-firmware = nixpkgs-stable.legacyPackages.${prev.system}.sof-firmware;
+    linux-firmware = nixpkgs-stable.legacyPackages.${prev.stdenv.hostPlatform.system}.linux-firmware;
+    sof-firmware = nixpkgs-stable.legacyPackages.${prev.stdenv.hostPlatform.system}.sof-firmware;
   })
 
   # wangle: disable flaky TLSInMemoryTicketProcessorTest (timing-sensitive,
@@ -39,7 +39,7 @@
   # Upstream 2.36.0 fixes this; nixpkgs PR #513478 is in flight.
   # Pin to stable until the bump lands on unstable.
   (final: prev: {
-    mozillavpn = nixpkgs-stable.legacyPackages.${prev.system}.mozillavpn;
+    mozillavpn = nixpkgs-stable.legacyPackages.${prev.stdenv.hostPlatform.system}.mozillavpn;
   })
 
   # wireshark 4.6.5: the gitlab tarball gzip wrapper isn't byte-stable, so the

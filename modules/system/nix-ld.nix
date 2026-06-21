@@ -19,25 +19,25 @@
     expat
 
     # - X11 and graphics
-    xorg.libX11
-    xorg.libxcb
-    xorg.libXext
-    xorg.libXi
-    xorg.libXrender
-    xorg.libXrandr
-    xorg.libXtst
-    xorg.libXcursor
-    xorg.libXfixes
-    xorg.libXdamage
-    xorg.libXcomposite
-    xorg.libXinerama
-    xorg.libxkbfile
-    xorg.libSM
-    xorg.libICE
-    xorg.xcbutilimage
-    xorg.xcbutilkeysyms
-    xorg.xcbutilrenderutil
-    xorg.xcbutilwm
+    libx11
+    libxcb
+    libxext
+    libxi
+    libxrender
+    libxrandr
+    libxtst
+    libxcursor
+    libxfixes
+    libxdamage
+    libxcomposite
+    libxinerama
+    libxkbfile
+    libsm
+    libice
+    libxcb-image
+    libxcb-keysyms
+    libxcb-render-util
+    libxcb-wm
     mesa
     libdrm
     libGL
