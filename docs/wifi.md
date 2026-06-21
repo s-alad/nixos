@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The BE201 wifi card crashes its own firmware (`NMI_INTERRUPT_UNKNOWN` → `Device error - SW reset`) every few minutes under load. Each crash drops the link for several seconds and feels like the whole machine froze. The fix is to disable TCP/Generic Segmentation Offload on the wifi interface so the buggy TX offload path in the firmware is never exercised. Done declaratively via a NetworkManager dispatcher in `modules/nixos/system/wifi-offload-fix.nix`.
+The BE201 wifi card crashes its own firmware (`NMI_INTERRUPT_UNKNOWN` → `Device error - SW reset`) every few minutes under load. Each crash drops the link for several seconds and feels like the whole machine froze. The fix is to disable TCP/Generic Segmentation Offload on the wifi interface so the buggy TX offload path in the firmware is never exercised. Done declaratively via a NetworkManager dispatcher in `modules/system/wifi-offload-fix.nix`.
 
 ## Hardware / driver state
 
@@ -10,7 +10,7 @@ The BE201 wifi card crashes its own firmware (`NMI_INTERRUPT_UNKNOWN` → `Devic
 - **Driver:** `iwlwifi` with op_mode `iwlmld` (mandatory — BZ silicon has no `iwlmvm` firmware)
 - **Firmware loaded:** `bz-b0-fm-c0-c101.ucode` version `101.6e695a70.0`
 - **Interface:** `wlp0s20f3`
-- **Kernel:** 7.0.0-cachyos
+- **Kernel:** 7.0.10-cachyos
 - **BIOS:** Lenovo N4EET19W (1.05) — current as of Sept 2025
 
 ## Symptoms
@@ -46,7 +46,7 @@ These were tried before landing on the offload fix — don't waste time on them 
 
 ## The fix
 
-`modules/nixos/system/wifi-offload-fix.nix` installs a NetworkManager dispatcher script. When `wlp0s20f3` transitions to `up` (boot, suspend resume, AP change), the script runs:
+`modules/system/wifi-offload-fix.nix` installs a NetworkManager dispatcher script. When `wlp0s20f3` transitions to `up` (boot, suspend resume, AP change), the script runs:
 
 ```
 ethtool -K wlp0s20f3 tso off gso off tx off
@@ -161,8 +161,8 @@ Run this for at least 30 minutes of sustained TX with offloads back on. If zero 
 
 Once Step 2 passes:
 
-1. Remove the import line from `hosts/salad/configuration.nix` (the line `../../modules/nixos/system/wifi-offload-fix.nix` in the `imports` list).
-2. Delete `modules/nixos/system/wifi-offload-fix.nix`.
+1. Remove the import line from `hosts/salad/configuration.nix` (the line `../../modules/system/wifi-offload-fix.nix` in the `imports` list).
+2. Delete `modules/system/wifi-offload-fix.nix`.
 3. Optionally clean up the related modprobe flags in `configuration.nix` if you want to also re-enable Wi-Fi 7 — that is a *separate* check (test that `disable_11be=1` removal doesn't bring back a different firmware bug; see "Things that did NOT help" above for context — `disable_11be` was an earlier mitigation, not the load-bearing fix).
 4. `ns` to rebuild.
 5. Reboot, then re-run the Step 2 stress test for another 30 minutes to confirm stable on a clean boot.
@@ -177,7 +177,7 @@ If NMIs return after removal:
 sudo ethtool -K wlp0s20f3 tso off gso off tx off
 ```
 
-Then re-add the deleted module and the import line, `ns`, and you're back to the workaround state. Git history of `/etc/nixos` makes this trivial — `git log --all -- modules/nixos/system/wifi-offload-fix.nix` to find the commit, `git checkout <sha> -- <path>` to restore.
+Then re-add the deleted module and the import line, `ns`, and you're back to the workaround state. Git history of `/etc/nixos` makes this trivial — `git log --all -- modules/system/wifi-offload-fix.nix` to find the commit, `git checkout <sha> -- <path>` to restore.
 
 ## If this doesn't fix it
 

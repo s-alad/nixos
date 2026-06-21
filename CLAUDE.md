@@ -6,8 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a NixOS 26.05 (Yarara) installation on a **Lenovo ThinkPad P1 Gen 8** workstation with the following key hardware:
 
-- **CPU**: Intel Core Ultra i9
-- **GPU**: NVIDIA RTX PRO 2000 Blackwell (driver 595.58.03 with CUDA 13.2, open kernel modules)
+- **CPU**: Intel Core Ultra 9 285H (Arrow Lake)
+- **GPU**: NVIDIA RTX PRO 2000 Blackwell (driver 595.x with CUDA 13.2, open kernel modules; config uses nvidiaPackages.stable)
 - **Graphics**: Hybrid Intel/NVIDIA setup with PRIME offload mode enabled
 - **Storage**: Dual SSD configuration
   - 2TB SSD running NIXOS
@@ -47,7 +47,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 │   └── failure.nix            (workarounds for broken-on-unstable packages)
 ├── scripts/
 │   └── devenv-init.sh         (devShell init script)
-├── docs/                       (CONTEXT.md, wifi.md, AUDIT.md)
+├── docs/                       (CONTEXT.md, wifi.md)
 └── modules/
     ├── system/                (NixOS SYSTEM modules — imported by hosts/salad/configuration.nix)
     │   ├── appimage.nix       (appimage runtime support)
@@ -86,7 +86,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 The system uses a hybrid approach:
 - **Primary**: nixos-unstable for all packages (including Cinnamon)
 - **Version locking**: flake.lock ensures reproducible builds
-- **Firmware stability**: `linux-firmware` is pinned to nixpkgs-stable via overlay in `/etc/nixos/flake.nix` because recent `nu` updates on nixos-unstable coincided with iwlwifi firmware timeouts, SW resets, and stuck queues on the Intel Wi-Fi 7 BE201. Pinning firmware keeps the CachyOS kernel while avoiding rapid firmware changes that can trigger freezes.
+- **Firmware stability**: `linux-firmware` AND `sof-firmware` are pinned to nixpkgs-stable via the overlay in `/etc/nixos/overlays/failure.nix` (imported by `flake.nix`) because recent `nu` updates on nixos-unstable coincided with iwlwifi firmware timeouts, SW resets, and stuck queues on the Intel Wi-Fi 7 BE201. Pinning firmware keeps the CachyOS kernel while avoiding rapid firmware changes that can trigger freezes.
 
 **Flake inputs:**
 ```nix
@@ -159,9 +159,9 @@ nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.l
 curl -s "https://api.github.com/repos/xddxdd/nix-cachyos-kernel/commits?sha=release&per_page=20" | jq -r '.[] | "\(.sha[:12]) \(.commit.committer.date[:10]) \(.commit.message | split("\n")[0])"'
 ```
 
-**Current kernel status (as of April 2026):**
-- Running: 6.19.10-cachyos
-- NVIDIA 595.58.03 supports kernel 6.19 -- no compatibility issues
+**Current kernel status (as of June 2026):**
+- Running: 7.0.10-cachyos
+- NVIDIA 595.x supports kernel 7.0 -- no compatibility issues
 
 ### Secrets Management
 
@@ -228,33 +228,17 @@ To compare two git commits without disturbing the live checkout, build each from
 The system uses **home-manager as a NixOS module** for user-specific packages and configurations.
 
 **Package locations:**
-- **System-wide packages**: `environment.systemPackages` in configuration.nix
-- **User packages**: `home.packages` in home.nix (managed by home-manager)
+- **System-wide packages**: the list in `packages/system-packages.nix` (plus any inline `environment.systemPackages` in `hosts/salad/configuration.nix`)
+- **User packages**: the list in `packages/home-packages.nix` (plus inline GUI apps in `home/salad.nix`), managed by home-manager
 
 **Adding packages:**
 
 ```bash
-# search for packages
-nix search nixpkgs <package-name>
-
-# for user packages: edit /etc/nixos/home.nix
-# add to home.packages = with pkgs; [ ... ]
-
-# for system packages: edit /etc/nixos/configuration.nix
-# add to environment.systemPackages = with pkgs; [ ... ]
-
-# rebuild system (rebuilds both NixOS and home-manager)
-ns  # or: nh os switch /etc/nixos
-
-# temporary shell with packages
-nix-shell -p <package-name>
-
-# update flake inputs
-nix flake update /etc/nixos
-
-# garbage collection
-sudo nix-collect-garbage -d
-nh clean all --keep 10       # keep last 10 generations (matches configured nh.clean policy)
+nix search nixpkgs <package-name>   # find a package
+# add it to packages/home-packages.nix (user) or packages/system-packages.nix (system)
+ns                                  # rebuild both NixOS and home-manager
+nix-shell -p <package-name>         # temporary shell without installing
+nh clean all --keep 10              # garbage collect (matches configured nh.clean policy)
 ```
 
 **Home-Manager mode:**
@@ -268,35 +252,9 @@ nh clean all --keep 10       # keep last 10 generations (matches configured nh.c
 
 ### XDG Base Directory Specification
 
-The system follows the **XDG Base Directory** standard for organizing user files:
-
-**Configuration:**
-```nix
-# In /etc/nixos/home/salad.nix
-xdg.enable = true;
-programs.zsh = {
-  enable = true;
-  dotDir = "${config.xdg.configHome}/zsh";  # XDG-compliant location
-};
-```
-
-**Environment variables set:**
-- `XDG_CONFIG_HOME` → `~/.config` (application configurations)
-- `XDG_DATA_HOME` → `~/.local/share` (application data)
-- `XDG_STATE_HOME` → `~/.local/state` (application state/logs)
-- `XDG_CACHE_HOME` → `~/.cache` (temporary cache files)
-
-**Benefits:**
-- Cleaner home directory (organized into standard locations)
-- Applications that respect XDG use proper directories
-- Easier backup (just backup `~/.config` for configs)
-- Shell configuration moved to `~/.config/zsh/` instead of `~/.zshrc`
-
-**Shell integration:**
-- Home-manager manages zsh via `programs.zsh.enable = true`
-- System-level zsh config (`/etc/nixos/modules/system/zsh.nix`) still applies
-- Session variables automatically sourced via home-manager
-- Both system and user configs coexist peacefully
+- `xdg.enable = true` in `home/salad.nix` sets the standard `XDG_*` dirs (`~/.config`, `~/.local/share`, `~/.local/state`, `~/.cache`).
+- zsh uses an XDG-compliant `dotDir = "${config.xdg.configHome}/zsh"` (config lives in `~/.config/zsh/`, not `~/.zshrc`).
+- Home-manager manages zsh (`programs.zsh.enable = true`) and sources session variables; the system-level `modules/system/zsh.nix` still applies on top.
 
 ### Maintenance
 
@@ -314,35 +272,20 @@ The system uses **NVIDIA PRIME Offload Mode** (not Sync Mode) for better battery
 
 - Intel Arc Pro 140T iGPU: `PCI:0:2:0`
 - NVIDIA RTX PRO 2000 Blackwell GPU: `PCI:1:0:0`
-- Running NVIDIA driver 595.58.03 with open-source kernel modules
+- Running NVIDIA driver 595.x (config uses `nvidiaPackages.stable`) with open-source kernel modules
 - Using Intel iHD for video acceleration (LIBVA_DRIVER_NAME="iHD")
 
 ### Graphics Testing
 
-```bash
-# check intel va-api
-vainfo
-
-# test opengl (intel)
-glxinfo | grep "OpenGL renderer"
-
-# test vulkan
-vulkaninfo
-
-# monitor gpu usage
-nvtop
-
-# check nvidia status
-nvidia-smi
-```
+Stock tools: `vainfo` (Intel VA-API), `glxinfo | grep "OpenGL renderer"`, `vulkaninfo`, `nvtop` (GPU usage), `nvidia-smi`.
 
 ### Kernel and Drivers
 
 - **kernel**: CachyOS Latest (`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest`)
-  - Currently running 6.19.10-cachyos with EEVDF scheduler
+  - Currently running 7.0.10-cachyos with EEVDF scheduler
   - CachyOS kernel provides performance optimizations and latest scheduler improvements
   - Kernel tracks the `release` branch, locked via `flake.lock` (not pinned with `?rev=`)
-- **nvidia drivers**: 595.58.03 stable with open kernel modules
+- **nvidia drivers**: 595.x stable (`nvidiaPackages.stable`) with open kernel modules
 - **intel microcode**: updates enabled
 - **wifi tuning**: `power_save=0 swcrypto=1 11n_disable=8 disable_11be=1` (for stability — 11be disabled due to BE201 firmware NMI crashes)
 
@@ -359,22 +302,7 @@ pkgs.cachyosKernels.linuxPackages-cachyos-hardened # security-hardened
 
 ### Installed Development Tools
 
-- **Languages**: Node.js, Yarn, Go, OCaml, Rust (rustc, cargo, rustfmt, clippy, rust-analyzer), Java (JDK), Python (uv)
-- **Editors**: VSCode, Cursor, Helix, Vim
-- **Version Control**: Git, GitHub CLI (gh)
-- **Containers**: Docker (user 'salad' is in docker group)
-- **Mobile Development**: ADB enabled, Android Studio, Watchman (React Native)
-- **Game Development**: Unity Hub, PrismLauncher (Minecraft)
-- **System Monitoring**: btop-cuda, htop, nvtopPackages.full, lm_sensors
-- **CLI Tools**: ripgrep, jq, fzf, eza, zoxide, bat, tmux, ffmpeg, starship, nh, dysk, fastfetch, mapscii
-- **File Transfer**: rsync (included by default), p7zip (for archive extraction)
-- **Archive Manager**: file-roller (GNOME archive manager, requires p7zip for encrypted archives)
-- **Cloud**: Google Cloud SDK, AWS CLI v2
-- **Database**: Redis, MongoDB Compass (RedisInsight currently broken in nixpkgs - use Flatpak if needed)
-- **Media**: OBS Studio (with CUDA encoding & virtual camera)
-- **Security**: Wireshark (with packet capture), Burp Suite, Seahorse, YubiKey Manager (ykman)
-- **VPN**: Mullvad VPN, Mozilla VPN (services with systemd-resolved)
-- **Disk utilities**: baobab (disk usage analyzer), dysk
+Broadly: language toolchains (Node/Yarn, Go, OCaml, Rust, JDK, Python/uv), editors (VSCode, Cursor, Helix, Vim), containers (Docker), mobile/game dev (Android Studio, ADB, Watchman, Unity Hub, PrismLauncher), CLI/monitoring tools (ripgrep, jq, fzf, eza, zoxide, bat, tmux, ffmpeg, btop-cuda, nvtop, dysk, fastfetch), cloud SDKs (gcloud, AWS CLI v2), databases (Redis, MongoDB Compass), media (OBS with CUDA + virtual camera), and security tools (Wireshark, Burp Suite, ykman). For the authoritative list see `packages/system-packages.nix` and `packages/home-packages.nix`.
 
 ### Nix Features Enabled
 
@@ -385,19 +313,7 @@ pkgs.cachyosKernels.linuxPackages-cachyos-hardened # security-hardened
 
 ### Running Non-NixOS Binaries
 
-The system has `nix-ld` configured with extensive libraries for running prebuilt binaries (see `/etc/nixos/modules/system/nix-ld.nix`):
-
-**Core Libraries**: fuse2, stdenv.cc, zlib, openssl, glib, gtk3, nss, nspr, pulseaudio, dbus, alsa-lib
-
-**Graphics & Display**: X11 (libX11, libXext, libXi, libXrender, libXrandr, libXtst, libXcursor, libXfixes, libXdamage, libXcomposite, libXinerama, libxkbfile, libxkbcommon), mesa, libdrm, libGL, libglvnd, vulkan-loader, wayland, cairo, pango, gdk-pixbuf, harfbuzz
-
-**Qt6 Support** (for Android Emulator GUI): qt6.qtbase, qt6.qtwayland, qt6.qtsvg, qt6.qtdeclarative, qt6.qt5compat
-
-**Accessibility & Fonts**: at-spi2-core, at-spi2-atk, fontconfig, freetype
-
-**Other**: libxslt, libxml2, icu, xcb utilities (image, keysyms, renderutil, wm)
-
-This comprehensive library set enables running Android Studio emulator, Qt applications, and most Linux binaries.
+`nix-ld` provides a runtime library set so prebuilt (non-Nix) Linux binaries find their shared libs — covering core libs, X11/Wayland/Mesa/Vulkan graphics, Qt6 (for the Android emulator GUI), and fonts/accessibility, enough to run Android Studio, Qt apps, and most prebuilt binaries. See `modules/system/nix-ld.nix` for the full set.
 
 ## System Services
 
@@ -409,11 +325,11 @@ This comprehensive library set enables running Android Studio emulator, Qt appli
 - **Bluetooth**: Enabled and auto-start on boot
 - **Printing**: CUPS enabled
 - **Firmware Updates**: fwupd enabled
-- **Thermal Management**: thermald for Intel CPU
+- **Thermal Management**: thermald enabled, but currently a no-op on this CPU — thermald 2.5.x doesn't support Arrow Lake (285H), so it starts, logs "Unsupported cpu model", and exits cleanly. Kept enabled so it auto-activates once a supporting build ships.
 - **SSD Optimization**: fstrim enabled
-- **Flatpak**: Enabled for additional package management
+- **Flatpak**: disabled (`services.flatpak.enable = false`)
 - **Fingerprint Authentication**: fprintd enabled with PAM integration
-- **VPN**: Mullvad VPN and Mozilla VPN services with systemd-resolved
+- **VPN**: Mullvad VPN and Mozilla VPN services with systemd-resolved; Tailscale mesh VPN via `modules/system/tailscale.nix`
 - **DNS**: systemd-resolved (required for VPN services)
 
 ### Power Management
@@ -438,9 +354,10 @@ Some programs require `programs.<name>.enable` instead of just adding to package
 - **adb**: provided by the `android-tools` package; `programs.adb` is intentionally disabled (systemd 258 uaccess udev rules grant USB device access automatically — no `adbusers` group needed)
 - **steam**: `programs.steam` - handles firewall configuration automatically
 - **gamemode**: `programs.gamemode.enable = true` - automatic performance optimizations when gaming (enabled)
+- **tailscale**: `services.tailscale.enable = true` - mesh VPN, configured in `modules/system/tailscale.nix`
 - **nh**: `programs.nh` - nix helper for better flake rebuild experience
 
-These are configured in `/etc/nixos/modules/system/programs.nix`, `/etc/nixos/modules/system/steam.nix`, and `/etc/nixos/modules/system/vpn.nix`.
+These are configured in `/etc/nixos/modules/system/programs.nix`, `/etc/nixos/modules/system/steam.nix`, `/etc/nixos/modules/system/vpn.nix`, and `/etc/nixos/modules/system/tailscale.nix`.
 
 ## Common Tasks
 
@@ -448,8 +365,8 @@ These are configured in `/etc/nixos/modules/system/programs.nix`, `/etc/nixos/mo
 
 1. search for it: `nix search nixpkgs <name>`
 2. add to the appropriate location:
-   - **user packages**: `/etc/nixos/home.nix` in `home.packages`
-   - **system packages**: `/etc/nixos/configuration.nix` in `environment.systemPackages`
+   - **user packages**: `/etc/nixos/packages/home-packages.nix` (or inline GUI apps in `home/salad.nix`)
+   - **system packages**: `/etc/nixos/packages/system-packages.nix` (or inline in `hosts/salad/configuration.nix`)
 3. rebuild: `ns` (using nh) or `sn` (traditional)
 
 ### Adding a Module
@@ -463,9 +380,11 @@ For home-manager modules: add a cross-platform module under `modules/home/common
 ### Updating System
 
 ```bash
-nu              # update flake inputs + rebuild
-nix flake update /etc/nixos && ns
+ua              # update apps only (safe -- excludes kernel)
+nu              # update ALL flake inputs (incl. kernel) + rebuild
 ```
+
+(Channels are disabled -- `nix.channel.enable = false` -- so there is no `nix-channel`/`un` workflow; updates go through flake inputs.)
 
 ### Troubleshooting Boot Issues
 
@@ -475,12 +394,7 @@ nix flake update /etc/nixos && ns
 
 ### Checking System Info
 
-```bash
-nixos-version          # nixos version
-nix --version          # nix package manager version
-uname -r               # kernel version
-lspci | grep -i vga    # graphics card info
-```
+Stock commands: `nixos-version`, `nix --version`, `uname -r` (kernel), `lspci | grep -i vga` (GPU).
 
 ## Important Notes
 
@@ -529,33 +443,7 @@ sudo cryptsetup luksDump /dev/nvme1n1p2 | grep -E "(Keyslots:|^\s+[0-9]+:)"
 | Laptop stolen while suspended | ❌ RAM contains decryption keys |
 | Cold boot attack | ❌ Vulnerable (RAM can be frozen and read) |
 
-**The vulnerability:** With TPM2 auto-unlock, the login screen (fingerprint/password) is the *only* barrier after boot. The drive decrypts automatically if the hardware is unmodified. This is a convenience vs security tradeoff.
-
-**Future hardening option - YubiKey FIDO2:**
-
-To require physical presence (YubiKey tap) at boot instead of TPM2 auto-unlock:
-
-```bash
-# 1. Install yubikey support in NixOS config:
-#    hardware.u2f.enable = true;
-#    environment.systemPackages = [ pkgs.yubikey-manager ];
-
-# 2. Verify YubiKey is detected
-ykman info
-
-# 3. Remove TPM2 auto-unlock (keeps password as backup)
-sudo systemd-cryptenroll --wipe-slot=tpm2 /dev/nvme1n1p2
-sudo systemd-cryptenroll --wipe-slot=tpm2 /dev/nvme1n1p3
-
-# 4. Enroll YubiKey FIDO2
-sudo systemd-cryptenroll /dev/nvme1n1p2 --fido2-device=auto --fido2-with-user-presence=true
-sudo systemd-cryptenroll /dev/nvme1n1p3 --fido2-device=auto --fido2-with-user-presence=true
-
-# Boot becomes: plug in YubiKey → tap → fingerprint login
-# Backup: type password if YubiKey lost (slot 0 preserved)
-```
-
-**Recommendation:** Current setup is reasonable for most threat models. Consider YubiKey FIDO2 if traveling with sensitive data or working in high-security environments.
+**The vulnerability:** With TPM2 auto-unlock, the login screen (fingerprint/password) is the *only* barrier after boot. The drive decrypts automatically if the hardware is unmodified — a convenience vs security tradeoff. (Replacing TPM2 with a YubiKey FIDO2 tap at boot via `systemd-cryptenroll --fido2-device=auto` is possible but not currently configured.)
 
 ### Plymouth & Silent Boot (Enabled)
 
@@ -595,33 +483,7 @@ usb autosuspend is disabled for the fingerprint reader to ensure reliability:
 
 ### Managing Fingerprints
 
-**enroll a fingerprint:**
-
-```bash
-fprintd-enroll
-```
-
-**list enrolled fingerprints:**
-
-```bash
-fprintd-list salad
-```
-
-**delete fingerprints:**
-
-```bash
-fprintd-delete salad
-```
-
-**verify device is detected:**
-
-```bash
-lsusb | grep synaptics
-```
-
-**to disable fingerprint authentication:**
-
-edit `/etc/nixos/modules/system/fingerprint.nix` and comment out or rebuild without importing it.
+Standard `fprintd` CLI: `fprintd-enroll`, `fprintd-list salad`, `fprintd-delete salad`; `lsusb | grep synaptics` to confirm the reader. To disable, stop importing `modules/system/fingerprint.nix` and rebuild.
 
 ## YubiKey
 
@@ -641,39 +503,7 @@ edit `/etc/nixos/modules/system/fingerprint.nix` and comment out or rebuild with
 
 ### Usage
 
-**verify yubikey is detected:**
-
-```bash
-ykman info
-```
-
-**registering on websites:**
-
-1. Go to site's security settings (GitHub, Google, AWS, Cloudflare, etc.)
-2. Look for "Security Key", "Passkey", or "Hardware Key"
-3. Follow prompts and tap YubiKey when it blinks
-
-### FIDO2 vs TOTP
-
-| Method | How it works | Security |
-|--------|--------------|----------|
-| FIDO2/U2F | Tap YubiKey when prompted | Phishing-proof (origin-bound) |
-| TOTP (Aegis) | Type 6-digit code | Can be phished |
-
-**Recommendation**: Use FIDO2 on sites that support it, keep Aegis for TOTP-only sites.
-
-### Future Options
-
-**FIDO2 SSH keys** (simpler than GPG):
-```bash
-# Generate resident SSH key on YubiKey
-ssh-keygen -t ed25519-sk -O resident -O application=ssh:mykey
-# Requires tap for each SSH connection
-```
-
-**GPG keys on YubiKey**: See gpg-ssh module - can move existing GPG keys to hardware for git signing and SSH.
-
-**LUKS FIDO2**: See "Security Considerations (TPM2 Auto-Unlock)" section for replacing TPM2 with YubiKey tap at boot.
+`ykman info` confirms detection. To register on a site, find its Security Key / Passkey / Hardware Key setting and tap the YubiKey when it blinks.
 
 ## Gaming
 
@@ -692,59 +522,24 @@ ssh-keygen -t ed25519-sk -O resident -O application=ssh:mykey
 
 ### Gamemode
 
-- **status**: **enabled**
-- **function**: automatically applies system optimizations when games start
-- sets cpu governor to performance mode
-- prioritizes game processes
-- reverts changes when games close
-
-**how to use:**
-```bash
-gamemoderun ./game    # manually launch with gamemode
-```
-
-steam automatically uses gamemode if enabled.
+Enabled (`programs.gamemode.enable = true`): Steam uses it automatically; `gamemoderun ./game` for manual launches. It applies performance optimizations (CPU governor, process priority) while a game runs and reverts on exit.
 
 ## Android & Mobile Development
 
 ### ADB (Android Debug Bridge)
 
-adb is enabled system-wide for android device debugging and development:
+adb works without root via the `android-tools` package + systemd 258 uaccess udev rules. `programs.adb` is intentionally disabled and there is no `adbusers` group — the udev rules tag the USB device for the logged-in seat instead. Standard `adb devices` / `adb shell` / `adb logcat` work out of the box.
 
-```bash
-# check connected devices
-adb devices
+### Android Studio & React Native
 
-# install an apk
-adb install app.apk
-
-# access device shell
-adb shell
-
-# logcat for debugging
-adb logcat
-```
-
-**note**: adb works without root via the `android-tools` package + systemd 258 uaccess udev rules. `programs.adb` is disabled and there is no `adbusers` group (the udev rules tag the device for the logged-in seat instead).
-
-### Android Studio
-
-android studio is installed with full emulator support. the `nix-ld` configuration includes all necessary libraries for the android emulator gui:
-
-- qt6 libraries for emulator interface
-- vulkan and opengl support for hardware acceleration
-- x11 and wayland support
-
-### React Native Development
-
-watchman is installed for react native file watching and hot reload functionality.
+Android Studio runs with full emulator support (the Qt6/Vulkan/OpenGL/X11/Wayland libs it needs come from `nix-ld`). Watchman is installed for React Native file watching/hot reload.
 
 ## Additional System Features
 
 - **gtk themes**: multiple themes installed (gruvbox, arc, nordic, dracula, catppuccin, spacx, palenight, oceanic, gruvterial)
 - **fonts**: roboto, iosevka nerd font, comic mono, aileron, atkinson hyperlegible, cantarell, adwaita
 - **gpm**: mouse support in tty enabled
-- **lightdm**: custom background from `/etc/nixos/assets/darkcarp.jpeg` (processed via imagemagick), hidpi enabled, mint-y-dark theme
+- **lightdm**: custom background from `/etc/nixos/assets/darkcarpet.jpeg` (processed via imagemagick), hidpi enabled, mint-y-dark theme
 
 ## Shell Aliases
 
@@ -752,6 +547,7 @@ Configured in `/etc/nixos/modules/home/linux/zsh.nix`:
 
 ```bash
 ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
+nd      # preview what `ns` will change vs the running system (nix store diff-closures)
 nu      # nh os switch path:/etc/nixos -u (update ALL inputs including kernel + rebuild)
 ua      # update apps only (safe - skips kernel input to avoid NVIDIA breakage)
 sn      # sudo nixos-rebuild switch (traditional fallback)
@@ -779,12 +575,12 @@ some features are commented out in modules that can be enabled:
 
 ### RedisInsight
 - **Status**: Broken in nixpkgs (missing `nix-prefetch-git` in build sandbox)
-- **Workaround**: Use Flatpak (`flatpak install flathub com.redis.RedisInsight`) or wait for upstream fix
+- **Workaround**: wait for upstream fix. (Flatpak is no longer an option — `services.flatpak.enable = false`.)
 
 ### CachyOS Kernel + NVIDIA
 - **Issue**: New kernel versions may not be supported by NVIDIA drivers yet
 - **Symptom**: Build fails with errors like `too few arguments to function 'zone_device_page_init'`
-- **Current status**: NVIDIA 595.x supports kernel 6.19 -- no current issues
+- **Current status**: NVIDIA 595.x supports kernel 7.0 -- no current issues
 - **If it breaks after `nu`**: Use `ua` for safe updates (excludes kernel), or pin the kernel with `?rev=` in `flake.nix`
 - **Check compatibility**: `nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'`
 
@@ -828,4 +624,4 @@ some features are commented out in modules that can be enabled:
 
 ## NEXT
 
-you may also read docs/CONTEXT.md (supporting docs live in docs/: CONTEXT.md, wifi.md, AUDIT.md)
+you may also read docs/CONTEXT.md (supporting docs live in docs/: CONTEXT.md, wifi.md)

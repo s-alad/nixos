@@ -21,7 +21,7 @@ sudo nixos-rebuild switch             # alias: sn
 # macOS (standalone home-manager via nh)
 nh home switch ~/salad/nixos -c datadog             # alias: hms
 nix flake update && nh home switch ... -c datadog   # alias: hmu
-home-manager switch --flake ~/salad/nixos#datadog -b backup  # alias: hmsb (with backup, use if Ansible conflicts)
+home-manager switch --flake ~/salad/nixos#datadog -b backup  # alias: hmb (with backup, use if Ansible conflicts)
 
 # First-time macOS activation (home-manager not in PATH yet)
 nix run home-manager/master -- switch --flake ~/salad/nixos#datadog -b backup
@@ -35,35 +35,35 @@ nix store diff-closures /run/current-system "$(nix build --no-link --print-out-p
 ```
 flake.nix                              # Two outputs: nixosConfigurations.salad + homeConfigurations.datadog
 ├── hosts/
-│   ├── salad/
-│   │   ├── configuration.nix          # NixOS system config (boot, hardware, nvidia, services, packages)
-│   │   └── hardware-configuration.nix
-│   └── datadog/                       # Reserved for future nix-darwin
+│   └── salad/                         # only NixOS host (datadog is standalone home-manager — no host dir)
+│       ├── configuration.nix          # NixOS system config (boot, hardware, nvidia, services, packages)
+│       └── hardware-configuration.nix
 ├── home/
 │   ├── salad.nix                      # NixOS HM entrypoint (shared imports + NixOS-specific + Linux-only packages)
 │   └── datadog.nix                    # macOS HM entrypoint (shared imports + macOS-specific + macOS-only packages)
+├── packages/                          # Package lists (plain Nix functions, not modules)
+│   ├── system-packages.nix            #   system-level on NixOS, home-level on macOS
+│   └── home-packages.nix              #   home-level on both
 ├── modules/
-│   ├── shared/                        # Package lists (plain Nix functions, not modules)
-│   │   ├── system-packages.nix        #   system-level on NixOS, home-level on macOS
-│   │   └── home-packages.nix          #   home-level on both
-│   ├── home-manager/                  # Shared HM modules (imported by both machines)
-│   │   ├── zsh.nix                    # Shell: oh-my-zsh + common aliases (eza, zoxide)
-│   │   ├── starship.nix              # Prompt: imports configs/starship.toml
-│   │   ├── neofetch.nix              # Custom neofetch theme + ASCII art
-│   │   ├── fonts.nix                 # Nerd fonts (minus adwaita-fonts, Linux-only)
-│   │   ├── git.nix                   # Shared git base (identity from secrets.nix, defaultBranch)
-│   │   └── direnv.nix               # Shared direnv + nix-direnv config
-│   ├── nixos/
-│   │   ├── system/                    # NixOS system-level modules (imported by configuration.nix)
-│   │   │   ├── zsh.nix               # System shell registration (environment.shells)
-│   │   │   ├── starship.nix          # System starship package
-│   │   │   └── ...                   # locale, fonts, fingerprint, containers, nix-ld, steam, vpn, etc.
-│   │   └── home/                      # NixOS HM overrides (imported by home/salad.nix)
-│   │       ├── zsh.nix               # dotDir, NixOS aliases (ns, nu, sn, un)
-│   │       └── git.nix               # SSH signing, safe.directory
-│   └── darwin/                        # macOS HM overrides (imported by home/datadog.nix)
-│       ├── zsh.nix                   # hms/hmu/hmsb aliases, corporate.zsh sourcing
-│       └── git.nix                   # dd-gitsign, corporate hooks, delta, URL rewrites
+│   ├── system/                        # NixOS system-level modules (imported by configuration.nix)
+│   │   ├── zsh.nix                    # System shell registration (environment.shells)
+│   │   ├── starship.nix               # System starship package
+│   │   ├── wifi-offload-fix.nix       # BE201 wifi TSO/GSO offload workaround (see wifi.md)
+│   │   └── ...                        # locale, fonts, fingerprint, containers, nix-ld, steam, vpn, etc.
+│   └── home/
+│       ├── common/                    # Shared HM modules (imported by both machines)
+│       │   ├── zsh.nix                # Shell: oh-my-zsh + common aliases (eza, zoxide)
+│       │   ├── starship.nix           # Prompt: imports configs/starship.toml
+│       │   ├── fastfetch.nix          # Custom fastfetch theme + ASCII art
+│       │   ├── fonts.nix              # Nerd fonts (minus adwaita-fonts, Linux-only)
+│       │   ├── git.nix                # Shared git base (identity from secrets.nix, defaultBranch)
+│       │   └── direnv.nix             # Shared direnv + nix-direnv config
+│       ├── linux/                     # NixOS HM overrides (imported by home/salad.nix)
+│       │   ├── zsh.nix                # dotDir, NixOS aliases (ns, nu, ua, sn, nd)
+│       │   └── git.nix                # SSH signing, safe.directory
+│       └── darwin/                    # macOS HM overrides (imported by home/datadog.nix)
+│           ├── zsh.nix                # hms/hmu/hmb aliases, corporate.zsh sourcing
+│           └── git.nix                # dd-gitsign, corporate hooks, delta, URL rewrites
 ├── configs/starship.toml              # Shared starship prompt config
 ├── scripts/devenv-init.sh             # Scaffolds devenv projects in .nixdev/
 ├── lib/lightdm-background.nix
@@ -76,22 +76,22 @@ flake.nix                              # Two outputs: nixosConfigurations.salad 
 Each subsystem (zsh, git, starship) follows the same pattern:
 
 ```
-modules/home-manager/<x>.nix     shared base (both machines)
-modules/nixos/home/<x>.nix       NixOS-specific overrides
-modules/darwin/<x>.nix            macOS-specific overrides
+modules/home/common/<x>.nix      shared base (both machines)
+modules/home/linux/<x>.nix       NixOS-specific overrides
+modules/home/darwin/<x>.nix      macOS-specific overrides
 ```
 
 ## Package Sharing Pattern
 
 Packages are plain Nix lists (not modules) so each package is defined once:
 
-- **`modules/shared/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gcc, gnumake, ripgrep, bat, eza, zoxide, fzf, jq, wget, nh, neofetch, cowsay, lolcat, tree, tlrc
-- **`modules/shared/home-packages.nix`** — `home.packages` on both. Cloud/ops: awscli2, google-cloud-sdk, azure-cli, eksctl, kind, kubectx, kubernetes-helm, skaffold, bazelisk
+- **`packages/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gcc, gnumake, ripgrep, bat, eza, zoxide, fzf, jq, wget, nh, fastfetch, cowsay, lolcat, tree, tlrc
+- **`packages/home-packages.nix`** — `home.packages` on both. Cloud/ops: awscli2, google-cloud-sdk, azure-cli, eksctl, kind, kubectx, kubernetes-helm, skaffold, bazelisk
 - **`home/salad.nix`** inline — Linux-only home packages (GUI apps: thunderbird, bottles, discord, slack, brave, etc.)
 - **`home/datadog.nix`** inline — macOS-only home packages (btop, gawk)
 - **`hosts/salad/configuration.nix`** inline — NixOS-only system packages (efibootmgr, nvidia tools, btop-cuda, etc.)
 
-To share a package: move it from the platform-specific location into the appropriate `modules/shared/*.nix` list, and remove it from where it was. Never duplicate — each package lives in exactly one place. Always verify the nixpkgs package name exists with `nix eval nixpkgs#<name>.name` before adding.
+To share a package: move it from the platform-specific location into the appropriate `packages/*.nix` list, and remove it from where it was. Never duplicate — each package lives in exactly one place. Always verify the nixpkgs package name exists with `nix eval nixpkgs#<name>.name` before adding.
 
 ## secrets.nix
 
@@ -101,13 +101,13 @@ Gitignored. Each machine has its own copy with different values:
 {
   gitUserName = "...";
   gitUserEmail = "...";
-  gitSigningKey = "...";    # only used by NixOS (modules/nixos/home/git.nix)
+  gitSigningKey = "...";    # only used by NixOS (modules/home/linux/git.nix)
   macUser = "...";           # macOS username, used by home/datadog.nix
 }
 ```
 
-- Shared `modules/home-manager/git.nix` reads `gitUserName` and `gitUserEmail`
-- NixOS `modules/nixos/home/git.nix` reads `gitSigningKey` for SSH signing
+- Shared `modules/home/common/git.nix` reads `gitUserName` and `gitUserEmail`
+- NixOS `modules/home/linux/git.nix` reads `gitSigningKey` for SSH signing
 - macOS signing is handled by dd-gitsign (via `~/.config/gitsign/gitconfig` include), not secrets.nix
 - On a fresh clone, must run `git add --force --intent-to-add secrets.nix` so Nix flakes can see it
 
@@ -115,10 +115,10 @@ Gitignored. Each machine has its own copy with different values:
 
 - `~/.config/zsh/corporate.zsh` — not Nix-managed, contains Datadog/corporate shell config
 - Extracted from the original `~/.zshrc` (Ansible block, dd-gitsign, pyenv, rbenv, nvm, SCFW, work aliases, Homebrew paths)
-- `modules/darwin/zsh.nix` sources it via `programs.zsh.initContent`
+- `modules/home/darwin/zsh.nix` sources it via `programs.zsh.initContent`
 - HM generates `~/.zshrc` → oh-my-zsh + starship + Nix tools first, then corporate config layers on top
 - Corporate PATH additions (Homebrew, pyenv, etc.) prepend to PATH, so corporate tools take precedence over Nix duplicates
-- If Ansible rewrites `~/.zshrc`, use `hmsb` alias to re-backup and take over
+- If Ansible rewrites `~/.zshrc`, use `hmb` alias to re-backup and take over
 
 ## macOS Pre-Activation Checklist
 
@@ -137,7 +137,7 @@ Before first `home-manager switch` on macOS:
 | `~/.zshrc` | Replaced (corporate config sourced from `~/.config/zsh/corporate.zsh`) | `.zshrc.backup` |
 | `~/.gitconfig` | Replaced (dd-gitsign included via `~/.config/gitsign/gitconfig`) | `.gitconfig.backup` |
 | `~/.config/starship.toml` | Replaced (same config as NixOS) | `starship.toml.backup` |
-| `~/.config/neofetch/config.conf` | Replaced with custom theme | `config.conf.backup` |
+| `~/.config/fastfetch/config.jsonc` | Replaced with custom theme | `config.jsonc.backup` |
 | `~/.zprofile` | NOT managed — keeps Homebrew shellenv | — |
 | `~/.oh-my-zsh/` | NOT deleted — HM uses its own copy from Nix store | — |
 | `~/.config/gitsign/gitconfig` | NOT managed — referenced via git include | — |
@@ -159,7 +159,7 @@ Aggressively migrated from 175+ Homebrew packages. Remaining `brew leaves`:
 - `font-meslo-lg-nerd-font` — Nerd Font for Terminal.app (MesloLGS Nerd Font, size 14)
 - All `datadog/tap/*` casks and `dd-*`, `dda`, `ddcall`, `ddr`, `ddtool`, `docker-desktop`, `font-hack-nerd-font`, etc.
 
-**Moved to Nix:** bat, btop, cowsay, eza, fzf, gawk, gcc, gh, git, gnumake, go, jq, lolcat, neofetch, nh, ripgrep, tree, tlrc, vim, wget, zoxide, awscli2, azure-cli, bazelisk, eksctl, google-cloud-sdk, kind, kubectx, kubernetes-helm, skaffold
+**Moved to Nix:** bat, btop, cowsay, eza, fzf, gawk, gcc, gh, git, gnumake, go, jq, lolcat, fastfetch, nh, ripgrep, tree, tlrc, vim, wget, zoxide, awscli2, azure-cli, bazelisk, eksctl, google-cloud-sdk, kind, kubectx, kubernetes-helm, skaffold
 
 **Still moveable:** `gnupg`, `pre-commit`, `pipx` (scfw depends on it — may need to stay), `pulumi` (verify not a Datadog fork)
 
@@ -171,17 +171,15 @@ HM-installed fonts use fontconfig. macOS terminals (Terminal.app, iTerm2) use Co
 
 - `nix-command` and `flakes` experimental features are enabled
 - `nixpkgs.config.allowUnfree = true` on both platforms (explicit in `home/datadog.nix` for standalone HM)
-- `home.backupFileExtension` only works in NixOS module integration, not standalone HM — use `-b backup` CLI flag (via `hmsb` alias)
-- `nh home switch` does NOT support `-b` flag — use `hmsb` (raw home-manager) when backups are needed
+- `home.backupFileExtension` only works in NixOS module integration, not standalone HM — use `-b backup` CLI flag (via `hmb` alias)
+- `nh home switch` does NOT support `-b` flag — use `hmb` (raw home-manager) when backups are needed
 - `nix flake check` fails on macOS without `secrets.nix` in git index — use `hms` directly instead
 - HM option naming differs from NixOS: `autosuggestion` (HM, singular) vs `autosuggestions` (NixOS, plural), `oh-my-zsh` (HM) vs `ohMyZsh` (NixOS), `settings` (HM) vs `extraConfig` (deprecated)
 - `initExtra` is deprecated in newer HM — use `initContent` instead
-- NixOS system-level modules are in `modules/nixos/system/`, NixOS HM overrides are in `modules/nixos/home/` — don't mix them
+- NixOS system-level modules are in `modules/system/`, NixOS HM overrides are in `modules/home/linux/` — don't mix them
 - Always verify nixpkgs package names with `nix eval nixpkgs#<name>.name` before adding (e.g., `helm` is NOT Kubernetes Helm — use `kubernetes-helm`)
 - Never add new packages without explicitly telling the user — only move existing ones
 - Cinnamon is **no longer pinned to stable** — runs from nixos-unstable. The old `packageOverrides` pin didn't catch individual top-level packages like `cinnamon-settings-daemon`.
-- **Backlight/brightness keys** require a polkit rule (`security.polkit.extraConfig`) because polkit 127 uses `realpath` for path comparison, breaking NixOS symlink paths for `csd-backlight-helper` via `pkexec`. See `configuration.nix`.
-- **Cinnamon crash fix**: `grouped-window-list` applet has an upstream bug where `set_child(icon)` is called synchronously during muffin's `window-created` signal, causing a segfault when the Clutter actor tree is not yet stable. Patched locally at `~/.local/share/cinnamon/applets/grouped-window-list@cinnamon.org/appGroup.js` — defers `set_child()` to `GLib.idle_add()` and removes icon from existing parent before reparenting. After Cinnamon upgrades, verify the local copy still overrides correctly or re-copy and patch.
 
 ## TODO
 
