@@ -27,7 +27,6 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 ├── flake.nix                   (inputs/outputs: nixosConfigurations.salad + homeConfigurations.datadog + formatter/checks/devShells.default)
 ├── flake.lock                  (locked package versions)
 ├── secrets.nix                 (gitignored secrets file)
-├── compare.sh                  (script to verify config changes)
 ├── CLAUDE.md                   (this file)
 ├── hosts/
 │   └── salad/                  (the ONLY NixOS host; datadog is standalone home-manager, not a NixOS host)
@@ -204,23 +203,25 @@ in
 
 ### Verifying Configuration Changes
 
-Use the comparison script to verify refactoring doesn't change system behavior:
+Use native Nix tooling (replaces the old `compare.sh`):
 
 ```bash
-cd /etc/nixos
-sudo ./compare.sh [commit1] [commit2]
+# Preview what `ns` would change vs the running system (alias: nd)
+nix store diff-closures /run/current-system \
+  "$(nix build --no-link --print-out-paths path:/etc/nixos#nixosConfigurations.salad.config.system.build.toplevel)"
 
-# examples:
-sudo ./compare.sh                 # compare last two commits
-sudo ./compare.sh HEAD~3 HEAD     # compare specific commits
-sudo ./compare.sh abc123 def456   # compare by hash
+# Is a change behavior-neutral? Compare derivation hashes (instant, no build):
+nix eval --raw path:/etc/nixos#nixosConfigurations.salad.config.system.build.toplevel.drvPath
+
+# Diff two generations package-by-package:
+nix store diff-closures /nix/var/nix/profiles/system-{N,M}-link
+
+# Does the whole flake still build?
+nix flake check path:/etc/nixos
 ```
 
-The script builds both configurations and uses `nix-diff` to show what changed.
-
-**Requirements:**
-- Git safe directory configured: `sudo git config --global --add safe.directory /etc/nixos`
-- This allows root to access the git repository when running compare.sh with sudo
+To compare two git commits without disturbing the live checkout, build each from a throwaway
+`git worktree` (copy in the gitignored `secrets.nix`) and `nix store diff-closures` the results.
 
 ### Package Management
 
@@ -821,7 +822,7 @@ some features are commented out in modules that can be enabled:
 - nixos wiki: https://wiki.nixos.org/
 - package search: https://search.nixos.org/packages
 - nixos options: https://search.nixos.org/options
-- comparison script: `/etc/nixos/compare.sh` for verifying config changes
+- verifying config changes: `nd` alias / `nix store diff-closures` (see "Verifying Configuration Changes")
 - nix flakes: https://nixos.wiki/wiki/Flakes
 - cachyos kernel commits: https://github.com/xddxdd/nix-cachyos-kernel/commits/release
 

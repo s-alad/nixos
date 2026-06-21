@@ -10,5 +10,6 @@
     nu = "nh os switch path:/etc/nixos -u";
     ua = "nix flake update nixpkgs home-manager nixpkgs-stable --flake /etc/nixos && nh os switch path:/etc/nixos";
     sn = "sudo nixos-rebuild switch";
+    nd = ''nix store diff-closures /run/current-system "$(nix build --no-link --print-out-paths path:/etc/nixos#nixosConfigurations.salad.config.system.build.toplevel)"'';
   };
 }

@@ -26,9 +26,8 @@ home-manager switch --flake ~/salad/nixos#datadog -b backup  # alias: hmsb (with
 # First-time macOS activation (home-manager not in PATH yet)
 nix run home-manager/master -- switch --flake ~/salad/nixos#datadog -b backup
 
-# Compare NixOS configs between commits (from /etc/nixos)
-./compare.sh                          # HEAD~1 vs HEAD
-./compare.sh <commit1> <commit2>
+# Preview what `ns` would change vs the running system (alias: nd)
+nix store diff-closures /run/current-system "$(nix build --no-link --print-out-paths path:/etc/nixos#nixosConfigurations.salad.config.system.build.toplevel)"
 ```
 
 ## Architecture
