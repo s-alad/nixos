@@ -261,6 +261,9 @@ in
     usbutils
     btop-cuda
     htop
+    glances
+    duf
+    tailspin
     mesa-demos
     vulkan-tools
     nvtopPackages.full
