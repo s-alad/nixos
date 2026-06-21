@@ -10,6 +10,5 @@
     nu = "nh os switch path:/etc/nixos -u";
     ua = "nix flake update nixpkgs home-manager nixpkgs-stable --flake /etc/nixos && nh os switch path:/etc/nixos";
     sn = "sudo nixos-rebuild switch";
-    un = "sudo nix-channel --update && nix-channel --update && sudo nixos-rebuild switch";
   };
 }

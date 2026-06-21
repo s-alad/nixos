@@ -117,7 +117,6 @@ nu                    # nh os switch path:/etc/nixos -u (updates ALL inputs incl
 
 # traditional method (still works as fallback)
 sn                    # sudo nixos-rebuild switch
-un                    # update channels + rebuild
 
 # manual flake rebuild
 sudo nixos-rebuild switch --flake path:/etc/nixos#salad
@@ -755,7 +754,6 @@ ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
 nu      # nh os switch path:/etc/nixos -u (update ALL inputs including kernel + rebuild)
 ua      # update apps only (safe - skips kernel input to avoid NVIDIA breakage)
 sn      # sudo nixos-rebuild switch (traditional fallback)
-un      # update channels + traditional rebuild
 ll      # eza -lh --group-directories-first --icons --git
 la      # eza -lah --group-directories-first --icons
 ls      # eza --group-directories-first --icons

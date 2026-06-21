@@ -327,6 +327,10 @@ in
 
   ##### SETTINGS
   nix = {
+    # pure-flake system: disable legacy nix-channels.
+    # (nix.nixPath still pins nixpkgs=flake:nixpkgs, so <nixpkgs> / nix-shell -p keep working.)
+    channel.enable = false;
+
     settings = {
       experimental-features = [
         "nix-command"
