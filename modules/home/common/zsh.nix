@@ -35,7 +35,7 @@
 
     history = {
       size = 10000;
-      path = "${config.home.homeDirectory}/.zsh_history";
+      path = "${config.xdg.stateHome}/zsh/history";  # XDG state (was ~/.zsh_history)
       ignoreAllDups = true;
     };
   };
