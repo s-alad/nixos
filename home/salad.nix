@@ -47,6 +47,9 @@
   # --- desktop wallpaper, reproducible from repo asset (was undeclared ~/Pictures/darkcarp.jpeg)
   home.file."Pictures/darkcarp.jpeg".source = ../assets/darkcarpet.jpeg;
 
+  # --- login avatar, reproducible from repo asset (AccountsService/LightDM read ~/.face)
+  home.file.".face".source = ../assets/face.png;
+
   home.packages = (import ../packages/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
     thunderbird
     # (bottles.override { removeWarningPopup = true; })

@@ -56,8 +56,6 @@
       };
 
       # ---- dev outputs: formatter / checks / devShell ----
-      # Built with nixpkgs' own lib (no third-party flake-utils input); only the two
-      # systems this repo actually targets.
       forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ];
     in
     static // {

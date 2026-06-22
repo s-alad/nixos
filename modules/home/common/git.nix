@@ -9,7 +9,6 @@ in
 
     ignores = [
       "**/.claude/settings.local.json"
-      # secret patterns — machine-wide guard against staging credentials (1d).
       # only affects UNTRACKED files; use `git add -f` to commit an intentional one.
       ".env"
       ".env.local"

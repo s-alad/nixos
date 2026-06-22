@@ -289,7 +289,6 @@ in
     clippy
     rust-analyzer
     gopls
-
     jdk
     uv
     lm_sensors
