@@ -90,8 +90,8 @@ modules/home/darwin/<x>.nix      macOS-specific overrides
 
 Packages are plain Nix lists (not modules) so each package is defined once:
 
-- **`packages/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gnumake, ripgrep, eza, jq, wget, nh, devenv, fastfetch, cowsay, lolcat, tree, tlrc, mitmproxy, postgresql, xclip. (zoxide/fzf/bat/direnv are NOT here — they come with shell integration from home-manager `programs.*` in `modules/home/common`.)
-- **`packages/home-packages.nix`** — `home.packages` on both. Cloud/ops: awscli2, google-cloud-sdk, azure-cli, eksctl, kind, kubectx, kubernetes-helm, skaffold, bazelisk
+- **`packages/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gnumake, ripgrep, eza, jq, wget, nh, devenv, fastfetch, cowsay, lolcat, tree, tlrc, lsof, mitmproxy, postgresql, xclip. (zoxide/fzf/bat/direnv are NOT here — they come with shell integration from home-manager `programs.*` in `modules/home/common`.)
+- **`packages/home-packages.nix`** — `home.packages` on both. Cloud/ops + dev: awscli2, google-cloud-sdk, eksctl, kind, kubectx, kubernetes-helm, skaffold, bazelisk, buildifier, wrangler, nodejs, yarn, lazydocker
 - **`home/salad.nix`** inline — Linux-only home packages (GUI apps: thunderbird, bottles, discord, slack, brave, etc.)
 - **`home/datadog.nix`** inline — macOS-only home packages (btop, gawk)
 - **`hosts/salad/configuration.nix`** inline — NixOS-only system packages (efibootmgr, nvidia tools, btop-cuda, etc.)
@@ -164,7 +164,7 @@ Aggressively migrated from 175+ Homebrew packages. Remaining `brew leaves`:
 - `font-meslo-lg-nerd-font` — Nerd Font for Terminal.app (MesloLGS Nerd Font, size 14)
 - All `datadog/tap/*` casks and `dd-*`, `dda`, `ddcall`, `ddr`, `ddtool`, `docker-desktop`, `font-hack-nerd-font`, etc.
 
-**Moved to Nix:** bat, btop, cowsay, eza, fzf, gawk, gcc, gh, git, gnumake, go, jq, lolcat, fastfetch, nh, ripgrep, tree, tlrc, vim, wget, zoxide, awscli2, azure-cli, bazelisk, eksctl, google-cloud-sdk, kind, kubectx, kubernetes-helm, skaffold
+**Moved to Nix:** bat, btop, cowsay, eza, fzf, gawk, gcc, gh, git, gnumake, go, jq, lolcat, fastfetch, nh, ripgrep, tree, tlrc, vim, wget, zoxide, awscli2, bazelisk, eksctl, google-cloud-sdk, kind, kubectx, kubernetes-helm, skaffold
 
 **Still moveable:** `gnupg`, `pre-commit`, `pipx` (scfw depends on it — may need to stay), `pulumi` (verify not a Datadog fork)
 

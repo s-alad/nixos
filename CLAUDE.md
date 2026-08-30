@@ -55,6 +55,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
     ├── system/                (NixOS SYSTEM modules — imported by hosts/salad/configuration.nix)
     │   ├── appimage.nix       (appimage runtime support)
     │   ├── boot.nix           (bootloader, cachyos kernel, silent boot, TPM2/LUKS, plymouth, iwlwifi modprobe)
+    │   ├── clamav.nix         (clamav anti-malware — SOC2/Vanta compliance, manual evidence)
     │   ├── containers.nix     (docker/podman)
     │   ├── desktop.nix        (Cinnamon + LightDM slick greeter, lightdm background)
     │   ├── fingerprint.nix    (fingerprint auth & pam)

@@ -152,6 +152,7 @@ in
     jdk
     uv
     lm_sensors
+    smartmontools
     pkg-config
     flameshot
     syncthing
