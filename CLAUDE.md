@@ -42,7 +42,8 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 ├── configs/                    (starship.toml, fastfetch.jsonc, fastfetch-ascii.txt)
 ├── assets/
 │   ├── darkcarpet.jpeg        (lightdm background image)
-│   └── face.png              (login avatar — declared via home.file.".face" in home/salad.nix)
+│   ├── face.png              (login avatar — declared via home.file.".face" in home/salad.nix)
+│   └── grouped-window-list-segfault.patch (48-line crash fix, applied to pkgs.cinnamon-common at build)
 ├── lib/
 │   ├── lightdm-background.nix (image processor/builder)
 │   └── devenv-init.nix       (shared devenv-init wrapper, used by both entrypoints)
@@ -68,6 +69,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
     │   ├── nix-ld.nix         (libraries for prebuilt binaries)
     │   ├── nixbuild.nix       (nixbuild.net remote builder — inactive, kept intentionally)
     │   ├── programs.nix       (firefox, java, adb, wireshark, obs, nh)
+    │   ├── session-env.nix    (GUI-visible XDG tool-home env vars via PAM — pairs with modules/home/linux/xdg-tool-homes.nix)
     │   ├── sst.nix            (sudo NOPASSWD rule for `sst tunnel`)
     │   ├── steam.nix          (steam & gamemode)
     │   ├── tailscale.nix      (tailscale mesh vpn)
@@ -86,8 +88,10 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
         │   ├── xdg-dotfiles.nix (shared XDG-relocated REPL history: NODE_REPL_HISTORY)
         │   └── zsh.nix        (oh-my-zsh, common aliases, XDG dotDir)
         ├── linux/             (NixOS-only HM OVERRIDES — git signing, ns/nu/ua rebuild aliases)
+        │   ├── cinnamon-applets.nix (5 Spices applets pinned via fetchFromGitHub + grouped-window-list patched from pkgs.cinnamon-common)
+        │   ├── dconf.nix      (declarative Cinnamon+Nemo desktop settings — ~96 keys, generated via dconf2nix)
         │   ├── git.nix
-        │   ├── xdg-tool-homes.nix (relocate GOPATH/ANDROID/npm/etc. tool homes into XDG dirs)
+        │   ├── xdg-tool-homes.nix (shell-only XDG relocations: psql/pulumi/vim histories; GUI-visible vars live in modules/system/session-env.nix)
         │   └── zsh.nix
         └── darwin/            (macOS-only HM OVERRIDES)
             ├── git.nix
@@ -620,12 +624,12 @@ some features are commented out in modules that can be enabled:
 ### Cinnamon Crash on Window Open (grouped-window-list segfault)
 - **Symptom**: Cinnamon crashes (SIGSEGV in `_clutter_actor_queue_only_relayout` → `clutter_actor_add_child_internal` → `st_bin_set_child`) when opening any window, especially Electron/Chromium apps
 - **Root cause**: `grouped-window-list@cinnamon.org` applet calls `this.iconBox.set_child(icon)` synchronously during muffin's `window-created` signal (`_meta_window_shared_new`). The Clutter actor tree is not yet stable during this signal, and `clutter_actor_add_child_internal` triggers a relayout that dereferences a parent pointer in an inconsistent state, causing a segfault.
-- **Fix**: Local patched copy at `~/.local/share/cinnamon/applets/grouped-window-list@cinnamon.org/appGroup.js`:
+- **Fix**: 48-line patch at `assets/grouped-window-list-segfault.patch`, applied at build to the applet from the *current* `pkgs.cinnamon-common` and deployed to `~/.local/share/cinnamon/applets/` via `modules/home/linux/cinnamon-applets.nix` (user-dir applets shadow the system copy). The patch to `appGroup.js`:
   1. Defers `set_child()` to a `GLib.idle_add()` callback so the actor tree is stable before reparenting
   2. Removes icon from existing parent before `set_child()` as an additional safety check
   3. Cleans up pending idle source in `destroy()` to prevent use-after-free
 - **Affects**: Both Cinnamon 6.4.x and 6.6.x — upstream bug, not version-specific
-- **Note**: This local copy overrides the system applet. After Cinnamon updates, check if the fix is still needed or if upstream patched it
+- **Note**: The patch re-applies automatically against each new Cinnamon version; if upstream refactors `appGroup.js` so it no longer applies, `ns` fails loudly — at that point check whether upstream fixed the bug (drop the patch) or regenerate it. (The Spices GUI updater can't write through store symlinks — applet updates happen via the pinned rev in `cinnamon-applets.nix`.)
 
 ## Resources
 

@@ -1,0 +1,48 @@
+--- a/appGroup.js
++++ b/appGroup.js
+@@ -317,10 +317,29 @@
+             }
+         }
+ 
+-        const oldChild = this.iconBox.get_child();
+-        this.iconBox.set_child(icon);
++        // Defer the actual reparenting to an idle callback to avoid segfaults
++        // when called during window-created signal (actor tree not yet stable)
++        if (this._pendingIconId) {
++            GLib.source_remove(this._pendingIconId);
++            this._pendingIconId = 0;
++        }
++        this._pendingIcon = icon;
++        this._pendingIconId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
++            this._pendingIconId = 0;
++            if (!this.iconBox || !this._pendingIcon) return GLib.SOURCE_REMOVE;
++
++            const newIcon = this._pendingIcon;
++            this._pendingIcon = null;
++
++            const oldChild = this.iconBox.get_child();
++            if (newIcon.get_parent()) {
++                newIcon.get_parent().remove_child(newIcon);
++            }
++            this.iconBox.set_child(newIcon);
++            if (oldChild) oldChild.destroy();
+ 
+-        if (oldChild) oldChild.destroy();
++            return GLib.SOURCE_REMOVE;
++        });
+     }
+ 
+     setText(text) {
+@@ -1211,6 +1230,12 @@
+         this.signals.disconnectAllSignals();
+         this.groupState.set({willUnmount: true});
+ 
++        if (this._pendingIconId) {
++            GLib.source_remove(this._pendingIconId);
++            this._pendingIconId = 0;
++            this._pendingIcon = null;
++        }
++
+         if (this.flashTimer > 0) {
+             Mainloop.source_remove(this.flashTimer);
+             this.flashTimer = 0;

@@ -18,7 +18,6 @@ in
       ../../modules/system/containers.nix
       ../../modules/system/clamav.nix
       ../../modules/system/zsh.nix
-
       ../../modules/system/gpg-ssh.nix
       ../../modules/system/nix-ld.nix
       ../../modules/system/steam.nix
@@ -31,6 +30,7 @@ in
       ../../modules/system/wifi-offload-fix.nix
       ../../modules/system/sst.nix
       ../../modules/system/nixbuild.nix
+      ../../modules/system/session-env.nix
     ];
 
 

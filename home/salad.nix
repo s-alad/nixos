@@ -10,10 +10,11 @@
     ../modules/home/common/direnv.nix
     ../modules/home/common/pass.nix
     ../modules/home/common/xdg-dotfiles.nix
-    # --- NixOS-specific
     ../modules/home/linux/zsh.nix
     ../modules/home/linux/git.nix
     ../modules/home/linux/xdg-tool-homes.nix
+    ../modules/home/linux/cinnamon-applets.nix
+    ../modules/home/linux/dconf.nix
   ];
 
   home.username = "salad";
@@ -24,10 +25,10 @@
   # --- home manager state version
   home.stateVersion = "25.11";
 
-  # --- desktop wallpaper, reproducible from repo asset (was undeclared ~/Pictures/darkcarp.jpeg)
+  # --- desktop wallpape
   home.file."Pictures/darkcarp.jpeg".source = ../assets/darkcarpet.jpeg;
 
-  # --- login avatar, reproducible from repo asset (AccountsService/LightDM read ~/.face)
+  # --- login avatar
   home.file.".face".source = ../assets/face.png;
 
   home.packages = (import ../packages/home-packages.nix { inherit pkgs; }) ++ (with pkgs; [
