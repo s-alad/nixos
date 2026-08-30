@@ -128,6 +128,7 @@ With flakes enabled, use these commands:
 ```bash
 # using nh (recommended)
 ns                    # nh os switch path:/etc/nixos (rebuild only, no updates)
+nb                    # nh os boot path:/etc/nixos (activate on next reboot -- use for big generation jumps)
 ua                    # update apps only (safe - excludes kernel)
 nu                    # nh os switch path:/etc/nixos -u (updates ALL inputs including kernel -- check NVIDIA compat first)
 
@@ -565,6 +566,7 @@ NixOS rebuild aliases in `/etc/nixos/modules/home/linux/zsh.nix`; cross-platform
 ```bash
 # modules/home/linux/zsh.nix (NixOS-only)
 ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
+nb      # nh os boot path:/etc/nixos (stage for next reboot, no live activation -- for big jumps that would restart the desktop stack)
 nd      # preview what `ns` will change vs the running system (nix store diff-closures)
 nu      # nh os switch path:/etc/nixos -u (update ALL inputs including kernel + rebuild)
 ua      # update apps only (safe - skips kernel input to avoid NVIDIA breakage)
