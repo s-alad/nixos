@@ -1,16 +1,10 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
+  # --- system fonts (shared set in packages/fonts.nix + NixOS-only extras)
   fonts.fontDir.enable = true;
 
-  fonts.packages = with pkgs; [
-    roboto
-    nerd-fonts.iosevka
-    nerd-fonts.dejavu-sans-mono
-    comic-mono
-    aileron
-    atkinson-hyperlegible
-    cantarell-fonts
+  fonts.packages = (import ../../packages/fonts.nix { inherit pkgs; }) ++ (with pkgs; [
     adwaita-fonts
-  ];
+  ]);
 }

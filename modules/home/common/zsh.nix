@@ -1,8 +1,11 @@
-{ config, pkgs, lib, ... }:
+{ config, ... }:
 
 {
   programs.zsh = {
     enable = true;
+
+    # XDG-compliant zsh location (config in ~/.config/zsh; silences dotDir deprecation warning)
+    dotDir = "${config.xdg.configHome}/zsh";
 
     enableCompletion = true;
     autosuggestion.enable = true;

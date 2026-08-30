@@ -10,7 +10,7 @@ The BE201 wifi card crashes its own firmware (`NMI_INTERRUPT_UNKNOWN` → `Devic
 - **Driver:** `iwlwifi` with op_mode `iwlmld` (mandatory — BZ silicon has no `iwlmvm` firmware)
 - **Firmware loaded:** `bz-b0-fm-c0-c101.ucode` version `101.6e695a70.0`
 - **Interface:** `wlp0s20f3`
-- **Kernel:** 7.0.10-cachyos
+- **Kernel:** 7.1.1-cachyos
 - **BIOS:** Lenovo N4EET19W (1.05) — current as of Sept 2025
 
 ## Symptoms

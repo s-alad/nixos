@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NixOS Config Architecture Audit — /etc/nixos</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161922; --panel2:#1c212e; --ink:#e6e9ef; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#7dd3fc; --good:#86efac; --warn:#fbbf24; --bad:#fca5a5;
+    --chip:#222838;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:0;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:32px 20px 80px}
+  header h1{font-size:1.7rem; margin:0 0 4px; letter-spacing:-.01em}
+  header .sub{color:var(--muted); font-size:.95rem; margin-bottom:6px}
+  header .meta{color:var(--muted); font-size:.82rem; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  h2{font-size:1.18rem; margin:38px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line); letter-spacing:-.01em}
+  h2 .num{color:var(--accent); margin-right:8px; font-variant-numeric:tabular-nums}
+  p{margin:.5em 0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.86em; background:var(--chip); padding:1px 6px; border-radius:5px; color:#cfe3ff; white-space:nowrap}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:14px 0}
+  .callout{border-left:4px solid var(--bad); background:linear-gradient(90deg,rgba(252,165,165,.08),transparent); border-radius:10px; padding:16px 18px; margin:16px 0}
+  .callout h3{margin:0 0 8px; color:var(--bad); font-size:1.05rem}
+  .callout.good{border-left-color:var(--good); background:linear-gradient(90deg,rgba(134,239,172,.08),transparent)}
+  ul{margin:.4em 0; padding-left:1.25em}
+  li{margin:.35em 0}
+  .tag{display:inline-block; font-size:.7rem; font-weight:600; padding:1px 8px; border-radius:999px; vertical-align:middle; margin-left:6px; font-family:ui-monospace,monospace; letter-spacing:.02em}
+  .t-safe{background:rgba(134,239,172,.14); color:var(--good)}
+  .t-care{background:rgba(251,191,36,.14); color:var(--warn)}
+  .t-low{background:rgba(154,164,178,.14); color:var(--muted)}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; margin:6px 0}
+  .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{color:var(--accent); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em}
+  td:first-child{white-space:nowrap; font-family:ui-monospace,monospace; font-size:.82rem; color:#cfe3ff}
+  .verdict{display:grid; grid-template-columns:1fr; gap:10px; margin-top:8px}
+  .vrow{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 14px}
+  .vrow b{color:var(--accent)}
+  .lead{font-size:1.02rem; color:var(--ink)}
+  .build{font-family:ui-monospace,monospace; font-size:.82rem; background:#0b0e14; border:1px solid var(--line); border-radius:8px; padding:10px 12px; color:var(--muted); margin:10px 0}
+  .build .ok{color:var(--good)}
+  .foot{margin-top:40px; color:var(--muted); font-size:.82rem; border-top:1px solid var(--line); padding-top:16px}
+  .pill{display:inline-block; background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:2px 10px; font-size:.75rem; color:var(--muted); margin:2px 4px 2px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NixOS Config Architecture Audit</h1>
+    <div class="sub">Full pass over <code>/etc/nixos</code> — placement · extraction · de-duplication · removal</div>
+    <div class="meta">2026-06-22 · 51-agent workflow + independent build-verification · run wf_d5651ce6-f63</div>
+    <div style="margin-top:10px">
+      <span class="pill">1,374 lines of Nix</span>
+      <span class="pill">configuration.nix = 381 (the heavyweight)</span>
+      <span class="pill">import graph sound</span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <h3>⚠️ Correction to the workflow's headline</h3>
+    <p>The workflow flagged the <b>wireshark overlay</b> (<code>overlays/failure.nix:45-59</code>) as a <i>“build-breaking bug, delete now, high severity.”</i> <b>That is false.</b> I built both source paths to check:</p>
+    <div class="build">
+      <span class="ok">✓</span> overlay hash <code>Zvrwxjp4…</code> → builds (cached)<br>
+      <span class="ok">✓</span> bare upstream hash <code>ysSfC…</code> (4.6.6) → also builds (cached)
+    </div>
+    <p>Both are 4.6.6 and both resolve from <code>cache.nixos.org</code>. The overlay is <b>redundant</b> — not broken, not load-bearing. Safe to remove as <i>cleanup</i>, but <b>low priority</b>. (The report also said mozillavpn-unstable is “2.38.0”; it's actually <b>2.37.0</b>.) The verifier rubber-stamped these external-state claims, so everything below was checked against the real files.</p>
+  </div>
+
+  <h2>Verdict on the four questions</h2>
+  <div class="verdict">
+    <div class="vrow"><b>Are things where they belong?</b> &nbsp;Mostly. One clear misplacement: Minecraft firewall ports (25565) sit in <code>tailscale.nix</code>.</div>
+    <div class="vrow"><b>Should things be extracted?</b> &nbsp;Yes — the biggest cleanliness win. <code>configuration.nix</code> is the only file breaking the repo's one-concern-per-module norm.</div>
+    <div class="vrow"><b>De-duplicated?</b> &nbsp;A handful of small, safe dups (all verified).</div>
+    <div class="vrow"><b>Removed?</b> &nbsp;Two stale overlay entries — both safe cleanup, neither urgent.</div>
+  </div>
+
+  <h2><span class="num">1</span>Extraction — the real cleanliness win</h2>
+  <p><code>configuration.nix</code> (381 lines) is a wall of inline config while everything else is modularized. Verified, behaviour-neutral extractions (confirm each with <code>nd</code> — diff-closures should be empty):</p>
+  <div class="panel scroll">
+  <table>
+    <thead><tr><th>New module</th><th>Moves out of configuration.nix</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>system/graphics.nix</td><td>hardware.graphics + hardware.nvidia (95-135), LIBVA_DRIVER_NAME (138-142), videoDrivers (216)</td><td>currently split across <b>3 regions</b></td></tr>
+      <tr><td>system/desktop.nix</td><td><code>bg</code> let (5), lightdm-background etc, Cinnamon/slick-greeter + commented GNOME/KDE (146-173)</td><td>largest block; <b>don't</b> drag the whole X11 stack</td></tr>
+      <tr><td>system/boot.nix</td><td>bootloader/kernel/silent-boot/TPM2/LUKS/plymouth/iwlwifi (30-74)</td><td>self-contained ~45 lines</td></tr>
+      <tr><td>system/networking.nix</td><td>hostname/NM/captive-portal/firewall (77-92)</td><td>smaller, optional</td></tr>
+      <tr><td>home/linux/xdg-tool-homes.nix</td><td>home.sessionPath + 12-var relocation block (salad.nix:26-45)</td><td>bulk of salad.nix's non-import content</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2><span class="num">2</span>Misplacement</h2>
+  <ul>
+    <li><code>tailscale.nix:10-12</code> — Minecraft ports (25565) have nothing to do with Tailscale → move to firewall section or <code>minecraft.nix</code>. <span class="tag t-safe">trivial / safe</span></li>
+    <li><code>configuration.nix:187-200</code> — SST sudo <code>NOPASSWD</code> rule sits between polkit and pipewire → relocate. <span class="tag t-safe">trivial / safe</span></li>
+  </ul>
+
+  <h2><span class="num">3</span>Duplication <span style="font-size:.8rem;color:var(--muted);font-weight:400">(all verified)</span></h2>
+  <ul>
+    <li><code>devenv</code> listed twice in the NixOS system: <code>system-packages.nix:17</code> + inline <code>configuration.nix:319</code> → drop 319. <span class="tag t-safe">trivial</span></li>
+    <li><code>zoxide</code>/<code>fzf</code>/<code>bat</code> (<code>system-packages.nix:12,13,27</code>) + <code>direnv</code> (<code>configuration.nix:318</code>) also enabled via HM <code>programs.*</code> → drop the bare ones. <b>Keep</b> <code>eza</code> and <code>devenv</code> (no <code>programs.*</code>). <span class="tag t-safe">trivial</span></li>
+    <li><code>devenv-init</code> wrapper copy-pasted: <code>configuration.nix:6</code> + <code>datadog.nix:5</code> → <code>lib/devenv-init.nix</code>. <span class="tag t-safe">small</span></li>
+    <li><code>programs.zsh.dotDir</code> set identically in <code>linux/zsh.nix:6</code> + <code>datadog.nix:38</code> → move to <code>common/zsh.nix</code> (delete from both or HM errors). <span class="tag t-care">trivial / care</span></li>
+    <li>Font list — 7 of 8 fonts duplicated between <code>system/fonts.nix</code> and <code>common/fonts.nix</code> (the latter is the Mac's only font path). <span class="tag t-care">needs care</span></li>
+  </ul>
+
+  <h2><span class="num">4</span>Idiom &amp; removable</h2>
+  <ul>
+    <li><code>linux/git.nix</code> sets <code>gpg.format="ssh"</code> but never <code>signing.format="ssh"</code>, so HM emits no pinned <code>gpg.ssh.program</code> → add it. <span class="tag t-care">real change — rebuild + verify signing</span></li>
+    <li><code>configuration.nix:1</code> declares unused <code>lib</code> arg (+ a few leaf modules) → optional trim; never drop trailing <code>...</code>. <span class="tag t-low">cosmetic</span></li>
+    <li><code>failure.nix:45-59</code> wireshark overlay — <b>redundant</b> (proven above) → safe to delete. <span class="tag t-low">low priority</span></li>
+    <li><code>failure.nix:41-43</code> mozillavpn pin — unstable now 2.37.0 (past the 2.36.0 fix) → removing is probably fine but it's a version bump. <span class="tag t-care">build-verify first</span></li>
+    <li><code>failure.nix:21-35</code> wangle/edencommon test-skips → keep; re-test on next <code>nu</code>. <span class="tag t-safe">keep</span></li>
+  </ul>
+
+  <h2><span class="num">5</span>Doc drift <span style="font-size:.8rem;color:var(--muted);font-weight:400">(cosmetic, one sweep)</span></h2>
+  <ul>
+    <li>CLAUDE.md says NixOS 26.05 / kernel 7.0.10 — kernel is actually <b>7.1.1</b>.</li>
+    <li>Alias table attributes <code>ll/la/ls/lt/cd</code> to the wrong file (they live in <code>common/zsh.nix</code>).</li>
+    <li>CONTEXT.md references a non-existent <code>modules/system/starship.nix</code>, omits <code>pass.nix</code>, and has a TODO that's already done.</li>
+    <li><code>assets/face.png</code> missing from the directory trees.</li>
+  </ul>
+
+  <div class="callout good">
+    <h3>Recommended order</h3>
+    <p><b>Do first (safe, high cleanliness gain):</b> the extractions (§1) + the dedups (§3) + the Minecraft-port move (§2). Each extraction verified drvPath-neutral with <code>nd</code>.</p>
+    <p><b>Lower value / needs a rebuild:</b> overlay removals (§4 — safe but low-value), the git-signing fix, and the mozillavpn-pin removal (build-verify).</p>
+  </div>
+
+  <div class="foot">
+    Sources — corrected note: <code>~/.claude/…/memory/project_nixos-config-audit-2026-06-22.md</code> ·
+    raw workflow synthesis (uncorrected): <code>/tmp/…/tasks/wsbxn2v5c.output</code> ·
+    live agent transcripts: <code>/workflows</code>.
+  </div>
+</div>
+</body>
+</html>

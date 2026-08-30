@@ -3,7 +3,7 @@
 let
   paper-src = pkgs.fetchurl {
     url = "https://download.paper.design/linux/appImage";
-    hash = "sha256-RwrexWyvJtK9RtsLSWiIn1TRCmJlh4aQtDLvLSJcKf4=";
+    hash = "sha256-gI/SInIcIn9C1jhLGVoHBuWrOghqNnLOQwtLuJYLCco=";
   };
 
   paper = pkgs.appimageTools.wrapType2 {

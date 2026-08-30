@@ -47,27 +47,32 @@ flake.nix                              # Two outputs: nixosConfigurations.salad 
 ├── modules/
 │   ├── system/                        # NixOS system-level modules (imported by configuration.nix)
 │   │   ├── zsh.nix                    # System shell registration (environment.shells)
-│   │   ├── starship.nix               # System starship package
 │   │   ├── wifi-offload-fix.nix       # BE201 wifi TSO/GSO offload workaround (see wifi.md)
-│   │   └── ...                        # locale, fonts, fingerprint, containers, nix-ld, steam, vpn, etc.
+│   │   └── ...                        # boot, graphics, desktop, networking, minecraft, sst, nixbuild, locale, fonts, fingerprint, containers, nix-ld, steam, vpn, etc.
 │   └── home/
 │       ├── common/                    # Shared HM modules (imported by both machines)
-│       │   ├── zsh.nix                # Shell: oh-my-zsh + common aliases (eza, zoxide)
+│       │   ├── zsh.nix                # Shell: oh-my-zsh + common aliases (eza, zoxide) + XDG dotDir
 │       │   ├── starship.nix           # Prompt: imports configs/starship.toml
 │       │   ├── fastfetch.nix          # Custom fastfetch theme + ASCII art
-│       │   ├── fonts.nix              # Nerd fonts (minus adwaita-fonts, Linux-only)
+│       │   ├── fonts.nix              # Shared fonts (user-level on darwin; NixOS uses system fonts.packages)
 │       │   ├── git.nix                # Shared git base (identity from secrets.nix, defaultBranch)
+│       │   ├── pass.nix               # password-store (pass)
+│       │   ├── xdg-dotfiles.nix       # Shared XDG-relocated REPL history (NODE_REPL_HISTORY)
 │       │   └── direnv.nix             # Shared direnv + nix-direnv config
 │       ├── linux/                     # NixOS HM overrides (imported by home/salad.nix)
-│       │   ├── zsh.nix                # dotDir, NixOS aliases (ns, nu, ua, sn, nd)
-│       │   └── git.nix                # SSH signing, safe.directory
+│       │   ├── zsh.nix                # NixOS aliases (ns, nu, ua, sn, nd)
+│       │   ├── xdg-tool-homes.nix     # Relocate GOPATH/ANDROID/npm/etc. into XDG dirs
+│       │   └── git.nix                # SSH signing (format=ssh), safe.directory
 │       └── darwin/                    # macOS HM overrides (imported by home/datadog.nix)
 │           ├── zsh.nix                # hms/hmu/hmb aliases, corporate.zsh sourcing
 │           └── git.nix                # dd-gitsign, corporate hooks, delta, URL rewrites
 ├── configs/starship.toml              # Shared starship prompt config
 ├── scripts/devenv-init.sh             # Scaffolds devenv projects in .nixdev/
 ├── lib/lightdm-background.nix
+├── lib/devenv-init.nix                # Shared devenv-init wrapper (both entrypoints)
+├── packages/fonts.nix                 # Shared font set (system on NixOS, home on darwin)
 ├── assets/darkcarpet.jpeg
+├── assets/face.png                    # Login avatar (home.file.".face")
 └── secrets.nix                        # Gitignored — different per machine (personal vs work identity)
 ```
 
@@ -85,7 +90,7 @@ modules/home/darwin/<x>.nix      macOS-specific overrides
 
 Packages are plain Nix lists (not modules) so each package is defined once:
 
-- **`packages/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gcc, gnumake, ripgrep, bat, eza, zoxide, fzf, jq, wget, nh, fastfetch, cowsay, lolcat, tree, tlrc
+- **`packages/system-packages.nix`** — `environment.systemPackages` on NixOS, `home.packages` on macOS. Core tools: vim, git, gh, go, gnumake, ripgrep, eza, jq, wget, nh, devenv, fastfetch, cowsay, lolcat, tree, tlrc, mitmproxy, postgresql, xclip. (zoxide/fzf/bat/direnv are NOT here — they come with shell integration from home-manager `programs.*` in `modules/home/common`.)
 - **`packages/home-packages.nix`** — `home.packages` on both. Cloud/ops: awscli2, google-cloud-sdk, azure-cli, eksctl, kind, kubectx, kubernetes-helm, skaffold, bazelisk
 - **`home/salad.nix`** inline — Linux-only home packages (GUI apps: thunderbird, bottles, discord, slack, brave, etc.)
 - **`home/datadog.nix`** inline — macOS-only home packages (btop, gawk)
@@ -185,9 +190,7 @@ HM-installed fonts use fontconfig. macOS terminals (Terminal.app, iTerm2) use Co
 
 - Eventually sanitize repo (rewrite git history to scrub PII from old commits via `git filter-repo`)
 - Share cross-platform CLI tools from NixOS to macOS (tmux, helix, glow, unzip, p7zip, fastfetch, uv, htop, ffmpeg, devenv, codex, chafa, w3m, dysk)
-- Share `devenv-init` script to macOS
 - Move remaining Homebrew packages to Nix (gnupg, pre-commit, pulumi)
-- Manage global gitignore declaratively via `programs.git.ignores`
 - Consider managing `gh` CLI config via `programs.gh`
 - Clean up duplicate Go version managers (`~/.g/` — Nix already provides Go)
-- Add `devShells` output to flake (nil + nixfmt for editing the flake itself)
+- Add `nil` LSP to the devShell (devShells output already exists with nh/nixfmt-rfc-style/nix-diff/git)

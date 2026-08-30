@@ -34,27 +34,20 @@
     });
   })
 
-  # mozillavpn 2.35.0: doesn't compile against Qt 6.11 — uses the deprecated
-  # QQmlPropertyMap(QObject*) ctor and treats deprecation warnings as errors.
-  # Upstream 2.36.0 fixes this; nixpkgs PR #513478 is in flight.
-  # Pin to stable until the bump lands on unstable.
-  (final: prev: {
-    mozillavpn = nixpkgs-stable.legacyPackages.${prev.stdenv.hostPlatform.system}.mozillavpn;
-  })
+  # NOTE (2026-08-04): session-desktop is currently unbuildable on BOTH channels
+  # and not in the binary cache, so it's temporarily removed (commented out in
+  # home/salad.nix) rather than worked around here:
+  #   - unstable 1.18.0: pnpm aborts with ERR_PNPM_MISSING_TARBALL_INTEGRITY
+  #     (its lockfile entry for the @emoji-mart/data github-release tarball has
+  #     no "integrity" field) during the fetch-deps phase.
+  #   - stable 1.17.5 (from source): @signalapp/better-sqlite3 fails to compile
+  #     against stable's Electron V8 ('v8::Object' has no member 'GetPrototype').
+  # Re-add to home/salad.nix (and delete this note) once either channel builds.
 
-  # wireshark 4.6.5: the gitlab tarball gzip wrapper isn't byte-stable, so the
-  # hash committed in nixpkgs (sha256-U30OJ8m+...) no longer matches what
-  # gitlab serves. Override with the currently-served hash.
-  (final: prev: {
-    wireshark-cli = prev.wireshark-cli.overrideAttrs (old: {
-      src = old.src.overrideAttrs (_: {
-        outputHash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
-      });
-    });
-    wireshark = prev.wireshark.overrideAttrs (old: {
-      src = old.src.overrideAttrs (_: {
-        outputHash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
-      });
-    });
-  })
+  # NOTE (2026-06-22 audit): two workarounds removed after verifying they were no
+  # longer needed on the current unstable:
+  #   - mozillavpn stable-pin (was for the 2.35.0 / Qt 6.11 build failure; unstable
+  #     is now 2.37.0, past the 2.36.0 fix).
+  #   - wireshark src outputHash override (was for a non-byte-stable gitlab tarball;
+  #     upstream 4.6.6's committed hash now resolves from cache.nixos.org).
 ]

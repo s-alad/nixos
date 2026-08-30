@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## System Overview
 
-This is a NixOS 26.05 (Yarara) installation on a **Lenovo ThinkPad P1 Gen 8** workstation with the following key hardware:
+This is a NixOS 26.11 (Zokor) installation on a **Lenovo ThinkPad P1 Gen 8** workstation with the following key hardware:
 
 - **CPU**: Intel Core Ultra 9 285H (Arrow Lake)
 - **GPU**: NVIDIA RTX PRO 2000 Blackwell (driver 595.x with CUDA 13.2, open kernel modules; config uses nvidiaPackages.stable)
@@ -30,19 +30,22 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 ├── CLAUDE.md                   (this file)
 ├── hosts/
 │   └── salad/                  (the ONLY NixOS host; datadog is standalone home-manager, not a NixOS host)
-│       ├── configuration.nix   (main system config; imports modules/system/*)
+│       ├── configuration.nix   (system glue: non-graphics hardware, audio/services, users, packages, nix settings; most config lives in modules/system/*)
 │       └── hardware-configuration.nix (auto-generated, do not edit)
 ├── home/                       (home-manager entrypoints, keyed by config name)
 │   ├── salad.nix              (NixOS user; pulled in via home-manager.users.salad in flake.nix)
 │   └── datadog.nix            (standalone home-manager for the aarch64-darwin work Mac)
-├── packages/                   (raw `{ pkgs }:` package LISTS — data, not modules)
+├── packages/                   (raw `{ pkgs }:` package/data LISTS — data, not modules)
 │   ├── system-packages.nix    (environment.systemPackages list)
-│   └── home-packages.nix      (home.packages list)
+│   ├── home-packages.nix      (home.packages list)
+│   └── fonts.nix              (shared font set — system fonts.packages on NixOS, home.packages on darwin)
 ├── configs/                    (starship.toml, fastfetch.jsonc, fastfetch-ascii.txt)
 ├── assets/
-│   └── darkcarpet.jpeg        (lightdm background image)
+│   ├── darkcarpet.jpeg        (lightdm background image)
+│   └── face.png              (login avatar — declared via home.file.".face" in home/salad.nix)
 ├── lib/
-│   └── lightdm-background.nix (image processor/builder)
+│   ├── lightdm-background.nix (image processor/builder)
+│   └── devenv-init.nix       (shared devenv-init wrapper, used by both entrypoints)
 ├── overlays/
 │   └── failure.nix            (workarounds for broken-on-unstable packages)
 ├── scripts/
@@ -51,13 +54,20 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
 └── modules/
     ├── system/                (NixOS SYSTEM modules — imported by hosts/salad/configuration.nix)
     │   ├── appimage.nix       (appimage runtime support)
+    │   ├── boot.nix           (bootloader, cachyos kernel, silent boot, TPM2/LUKS, plymouth, iwlwifi modprobe)
     │   ├── containers.nix     (docker/podman)
+    │   ├── desktop.nix        (Cinnamon + LightDM slick greeter, lightdm background)
     │   ├── fingerprint.nix    (fingerprint auth & pam)
     │   ├── fonts.nix          (system fonts)
     │   ├── gpg-ssh.nix        (gpg agent with ssh support)
+    │   ├── graphics.nix       (hybrid Intel/NVIDIA PRIME offload, videoDrivers, LIBVA)
     │   ├── locale.nix         (timezone & internationalization)
+    │   ├── minecraft.nix      (Minecraft server firewall ports 25565)
+    │   ├── networking.nix     (hostname, NetworkManager, captive-portal detection)
     │   ├── nix-ld.nix         (libraries for prebuilt binaries)
+    │   ├── nixbuild.nix       (nixbuild.net remote builder — inactive, kept intentionally)
     │   ├── programs.nix       (firefox, java, adb, wireshark, obs, nh)
+    │   ├── sst.nix            (sudo NOPASSWD rule for `sst tunnel`)
     │   ├── steam.nix          (steam & gamemode)
     │   ├── tailscale.nix      (tailscale mesh vpn)
     │   ├── vpn.nix            (mullvad & mozilla vpn services)
@@ -72,9 +82,11 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
         │   ├── git.nix        (base git config using secrets.nix)
         │   ├── pass.nix
         │   ├── starship.nix
-        │   └── zsh.nix
+        │   ├── xdg-dotfiles.nix (shared XDG-relocated REPL history: NODE_REPL_HISTORY)
+        │   └── zsh.nix        (oh-my-zsh, common aliases, XDG dotDir)
         ├── linux/             (NixOS-only HM OVERRIDES — git signing, ns/nu/ua rebuild aliases)
         │   ├── git.nix
+        │   ├── xdg-tool-homes.nix (relocate GOPATH/ANDROID/npm/etc. tool homes into XDG dirs)
         │   └── zsh.nix
         └── darwin/            (macOS-only HM OVERRIDES)
             ├── git.nix
@@ -160,8 +172,8 @@ curl -s "https://api.github.com/repos/xddxdd/nix-cachyos-kernel/commits?sha=rele
 ```
 
 **Current kernel status (as of June 2026):**
-- Running: 7.0.10-cachyos
-- NVIDIA 595.x supports kernel 7.0 -- no compatibility issues
+- Running: 7.1.1-cachyos
+- NVIDIA 595.x supports kernel 7.1 -- no compatibility issues
 
 ### Secrets Management
 
@@ -282,7 +294,7 @@ Stock tools: `vainfo` (Intel VA-API), `glxinfo | grep "OpenGL renderer"`, `vulka
 ### Kernel and Drivers
 
 - **kernel**: CachyOS Latest (`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest`)
-  - Currently running 7.0.10-cachyos with EEVDF scheduler
+  - Currently running 7.1.1-cachyos with EEVDF scheduler
   - CachyOS kernel provides performance optimizations and latest scheduler improvements
   - Kernel tracks the `release` branch, locked via `flake.lock` (not pinned with `?rev=`)
 - **nvidia drivers**: 595.x stable (`nvidiaPackages.stable`) with open kernel modules
@@ -543,14 +555,17 @@ Android Studio runs with full emulator support (the Qt6/Vulkan/OpenGL/X11/Waylan
 
 ## Shell Aliases
 
-Configured in `/etc/nixos/modules/home/linux/zsh.nix`:
+NixOS rebuild aliases in `/etc/nixos/modules/home/linux/zsh.nix`; cross-platform file/`cd` aliases in `/etc/nixos/modules/home/common/zsh.nix`:
 
 ```bash
+# modules/home/linux/zsh.nix (NixOS-only)
 ns      # nh os switch path:/etc/nixos (rebuild only, no updates)
 nd      # preview what `ns` will change vs the running system (nix store diff-closures)
 nu      # nh os switch path:/etc/nixos -u (update ALL inputs including kernel + rebuild)
 ua      # update apps only (safe - skips kernel input to avoid NVIDIA breakage)
 sn      # sudo nixos-rebuild switch (traditional fallback)
+
+# modules/home/common/zsh.nix (both machines)
 ll      # eza -lh --group-directories-first --icons --git
 la      # eza -lah --group-directories-first --icons
 ls      # eza --group-directories-first --icons
@@ -580,7 +595,7 @@ some features are commented out in modules that can be enabled:
 ### CachyOS Kernel + NVIDIA
 - **Issue**: New kernel versions may not be supported by NVIDIA drivers yet
 - **Symptom**: Build fails with errors like `too few arguments to function 'zone_device_page_init'`
-- **Current status**: NVIDIA 595.x supports kernel 7.0 -- no current issues
+- **Current status**: NVIDIA 595.x supports kernel 7.1 -- no current issues
 - **If it breaks after `nu`**: Use `ua` for safe updates (excludes kernel), or pin the kernel with `?rev=` in `flake.nix`
 - **Check compatibility**: `nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'`
 

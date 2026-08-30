@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -9,9 +9,11 @@
     ../modules/home/common/git.nix
     ../modules/home/common/direnv.nix
     ../modules/home/common/pass.nix
+    ../modules/home/common/xdg-dotfiles.nix
     # --- NixOS-specific
     ../modules/home/linux/zsh.nix
     ../modules/home/linux/git.nix
+    ../modules/home/linux/xdg-tool-homes.nix
   ];
 
   home.username = "salad";
@@ -21,28 +23,6 @@
 
   # --- home manager state version
   home.stateVersion = "25.11";
-
-  # --- Go toolchain paths (moved from configuration.nix environment.interactiveShellInit)
-  home.sessionPath = [ "${config.home.homeDirectory}/.local/share/go/bin" ];
-
-  # --- relocate tool homes / REPL histories off $HOME root into XDG dirs (1b).
-  # forward-only: tools read these at startup and write to the new path; existing
-  # ~/.npm, ~/.android, etc. must be moved/deleted once (after a fresh relogin).
-  home.sessionVariables = {
-    GOPATH = "${config.home.homeDirectory}/.local/share/go";
-
-    NPM_CONFIG_CACHE  = "${config.xdg.cacheHome}/npm";        # ~/.npm (8G)   -> ~/.cache/npm
-    ANDROID_USER_HOME = "${config.xdg.dataHome}/android";     # ~/.android (9G AVDs) -> ~/.local/share/android
-    ANDROID_HOME      = "${config.home.homeDirectory}/Android/Sdk";  # explicit SDK location
-    ANDROID_SDK_ROOT  = "${config.home.homeDirectory}/Android/Sdk";
-    DOTNET_CLI_HOME             = "${config.xdg.dataHome}/dotnet";   # ~/.dotnet -> XDG
-    DOTNET_CLI_TELEMETRY_OPTOUT = "1";
-    __GL_SHADER_DISK_CACHE_PATH = "${config.xdg.cacheHome}/nv";      # ~/.nv     -> ~/.cache/nv
-    NODE_REPL_HISTORY = "${config.xdg.stateHome}/node/history";      # ~/.node_repl_history
-    PSQL_HISTORY      = "${config.xdg.stateHome}/psql/history";      # ~/.psql_history
-    PULUMI_HOME       = "${config.xdg.dataHome}/pulumi";            # ~/.pulumi
-    VIMINIT           = "set viminfo+=n${config.xdg.stateHome}/vim/viminfo";  # ~/.viminfo
-  };
 
   # --- desktop wallpaper, reproducible from repo asset (was undeclared ~/Pictures/darkcarp.jpeg)
   home.file."Pictures/darkcarp.jpeg".source = ../assets/darkcarpet.jpeg;
@@ -84,7 +64,9 @@
     monero-cli
     monero-gui
     framesh
-    session-desktop
+    # session-desktop  # 2026-08-04: unbuildable on both channels + uncached
+    # (unstable 1.18.0 pnpm integrity bug; stable 1.17.5 better-sqlite3 vs V8).
+    # See overlays/failure.nix. Re-enable once upstream builds again.
     cloudflared
     telegram-desktop
   ]);

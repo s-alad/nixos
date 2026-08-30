@@ -9,8 +9,7 @@ with pkgs; [
 
   # --- shell dependencies (required for zsh aliases and plugins to work)
   eza       # aliased as ls/ll/la/lt
-  zoxide    # aliased as cd
-  fzf       # fuzzy finder
+  # zoxide / fzf / bat provided with shell integration by home-manager programs.* (modules/home/common)
 
   # --- nix tools
   nh
@@ -24,7 +23,6 @@ with pkgs; [
   wget
   gnumake
   ripgrep
-  bat
   fastfetch
   # gnupg provided by programs.gnupg.agent (modules/system/gpg-ssh.nix)
   lsof

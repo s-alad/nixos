@@ -2,7 +2,7 @@
 
 let
   secrets = import ../secrets.nix;
-  devenv-init = pkgs.writeShellScriptBin "devenv-init" (builtins.readFile ../scripts/devenv-init.sh);
+  devenv-init = import ../lib/devenv-init.nix { inherit pkgs; };
 in
 {
   imports = [
@@ -14,6 +14,7 @@ in
     ../modules/home/common/git.nix
     ../modules/home/common/direnv.nix
     ../modules/home/common/pass.nix
+    ../modules/home/common/xdg-dotfiles.nix
     # --- macOS-specific
     ../modules/home/darwin/zsh.nix
     ../modules/home/darwin/git.nix
@@ -27,15 +28,11 @@ in
 
   xdg.enable = true;
 
-  # --- tidy up dotfile clutter into XDG state dirs
+  # --- tidy up dotfile clutter into XDG state dirs (NODE_REPL_HISTORY shared via common/xdg-dotfiles.nix)
   home.sessionVariables = {
     LESSHISTFILE = "${config.xdg.stateHome}/less/history";
-    NODE_REPL_HISTORY = "${config.xdg.stateHome}/node/history";
     VIMINFOFILE = "${config.xdg.stateHome}/vim/viminfo";
   };
-
-  # --- XDG-compliant zsh location (silences dotDir deprecation warning)
-  programs.zsh.dotDir = "${config.xdg.configHome}/zsh";
 
   # --- shared packages (system-level on NixOS, user-level here)
   home.packages =
