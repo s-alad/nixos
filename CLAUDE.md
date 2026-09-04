@@ -91,7 +91,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
         │   ├── cinnamon-applets.nix (5 Spices applets pinned via fetchFromGitHub + grouped-window-list patched from pkgs.cinnamon-common)
         │   ├── dconf.nix      (declarative Cinnamon+Nemo desktop settings — ~96 keys, generated via dconf2nix)
         │   ├── git.nix
-        │   ├── xdg-tool-homes.nix (shell-only XDG relocations: psql/pulumi/vim histories; GUI-visible vars live in modules/system/session-env.nix)
+        │   ├── xdg-tool-homes.nix (shell-only XDG relocations: psql/pulumi/vim/bash histories + wgetrc; GUI-visible vars live in modules/system/session-env.nix)
         │   └── zsh.nix
         └── darwin/            (macOS-only HM OVERRIDES)
             ├── git.nix

@@ -70,6 +70,7 @@
     # See overlays/failure.nix. Re-enable once upstream builds again.
     cloudflared
     telegram-desktop
+    chatgpt
   ]);
 
   # --- home manager self management

@@ -12,5 +12,7 @@
     DOTNET_CLI_HOME             = "/home/salad/.local/share/dotnet";
     DOTNET_CLI_TELEMETRY_OPTOUT = "1";
     __GL_SHADER_DISK_CACHE_PATH = "/home/salad/.cache/nv";
+    CUDA_CACHE_PATH             = "/home/salad/.cache/nv/ComputeCache"; # ~/.nv
+    XCOMPOSECACHE               = "/home/salad/.cache/X11/xcompose";    # ~/.compose-cache
   };
 }
