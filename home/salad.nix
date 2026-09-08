@@ -70,7 +70,8 @@
     # See overlays/failure.nix. Re-enable once upstream builds again.
     cloudflared
     telegram-desktop
-    chatgpt
+    railway
+    # chatgpt  # macOS-only upstream (repacked ChatGPT.app) - no Linux desktop app exists
   ]);
 
   # --- home manager self management
