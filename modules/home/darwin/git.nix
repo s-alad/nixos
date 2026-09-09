@@ -3,10 +3,19 @@
 {
   # macOS-specific git overrides (shared config in modules/home/common/git.nix)
 
-  # --- dd-gitsign handles signing via the included gitconfig
-  programs.git.includes = [
-    { path = "~/.config/gitsign/gitconfig"; }
-  ];
+  launchd.agents.load-github-ssh-keys = {
+    enable = true;
+    config = {
+      ProgramArguments = [
+        "${pkgs.writeShellScript "load-github-ssh-keys" ''
+          /usr/bin/ssh-add --apple-use-keychain "${config.home.homeDirectory}/.ssh/id_ed25519" >/dev/null 2>&1
+          /usr/bin/ssh-add "${config.home.homeDirectory}/.ssh/id_ed25519_ddoghq" >/dev/null 2>&1
+        ''}"
+      ];
+      ProcessType = "Background";
+      RunAtLoad = true;
+    };
+  };
 
   programs.git.settings = {
     core = {
