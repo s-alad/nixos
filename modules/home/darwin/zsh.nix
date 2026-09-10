@@ -1,7 +1,22 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
+let
+  sshAgentSocket = "${config.home.homeDirectory}/.ssh/macos-agent.sock";
+in
 {
   # macOS-specific zsh overrides (base config in modules/home/common/zsh.nix)
+
+  # Connect local shells that missed launchd's dynamic SSH agent environment.
+  programs.zsh.envExtra = ''
+    if [[ -z "$SSH_CONNECTION" && ( -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ) && -S "${sshAgentSocket}" ]]; then
+      export SSH_AUTH_SOCK="${sshAgentSocket}"
+    fi
+  '';
 
   programs.zsh.shellAliases = {
     hms = "nh home switch ~/salad/nixos -c datadog";

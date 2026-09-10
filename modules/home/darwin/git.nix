@@ -1,5 +1,13 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
+let
+  sshAgentSocket = "${config.home.homeDirectory}/.ssh/macos-agent.sock";
+in
 {
   # macOS-specific git overrides (shared config in modules/home/common/git.nix)
 
@@ -8,6 +16,9 @@
     config = {
       ProgramArguments = [
         "${pkgs.writeShellScript "load-github-ssh-keys" ''
+          # Keep a stable link to macOS's per-login SSH agent socket.
+          /bin/ln -sfn "$SSH_AUTH_SOCK" "${sshAgentSocket}"
+
           /usr/bin/ssh-add --apple-use-keychain "${config.home.homeDirectory}/.ssh/id_ed25519" >/dev/null 2>&1
           /usr/bin/ssh-add "${config.home.homeDirectory}/.ssh/id_ed25519_ddoghq" >/dev/null 2>&1
         ''}"
