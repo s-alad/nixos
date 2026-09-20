@@ -1,19 +1,23 @@
 { config, pkgs, lib, ... }:
 
 let
+  # NOTE: unversioned upstream URL - every Paper release replaces the file in
+  # place and breaks this hash. On mismatch: take the "got:" hash from the ns
+  # error, and get the new version from
+  #   curl -sIL https://download.paper.design/linux/appImage | grep -i content-disposition
   paper-src = pkgs.fetchurl {
     url = "https://download.paper.design/linux/appImage";
-    hash = "sha256-gI/SInIcIn9C1jhLGVoHBuWrOghqNnLOQwtLuJYLCco=";
+    hash = "sha256-EkrUhc1scLrjiYfENshKiDYn5n/z3YbWTAbYhFXn3Wc=";
   };
 
   paper = pkgs.appimageTools.wrapType2 {
     pname = "paper";
-    version = "260407lr7cv5171";
+    version = "0.5.11";
     src = paper-src;
     extraInstallCommands =
       let contents = pkgs.appimageTools.extract {
         pname = "paper";
-        version = "260407lr7cv5171";
+        version = "0.5.11";
         src = paper-src;
       };
       in ''
