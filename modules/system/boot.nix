@@ -6,8 +6,8 @@
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest; # CachyOS with EEVDF scheduler
-  # --- explicit kernel modules
-  boot.kernelModules = [ "kvm-intel" ];
+  # --- explicit kernel modules (vhost_vsock: claude-desktop Cowork micro-VMs)
+  boot.kernelModules = [ "kvm-intel" "vhost_vsock" ];
   # --- silent boot
   boot.consoleLogLevel = 3;
   boot.initrd.verbose = false;

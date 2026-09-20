@@ -175,7 +175,7 @@ in
     glow
     nvitop
     devenv-init
-    codex
+    llm-agents.codex # from numtide llm-agents overlay (see flake.nix)
     traceroute
   ]);
 

@@ -37,9 +37,14 @@
     discord
     stremio-linux-shell
     slack
-    opencode
-    claude-code
-    code-cursor
+    # ai tools from the numtide llm-agents overlay (daily-updated; see flake.nix)
+    llm-agents.opencode
+    llm-agents.claude-code
+    llm-agents.claude-desktop # official claude desktop app (linux beta)
+    llm-agents.chatgpt # official chatgpt/codex desktop app
+    llm-agents.crush # charmbracelet AI coding agent
+    llm-agents.hunk # terminal diff viewer for agentic changesets
+    code-cursor # cursor IDE - not in llm-agents (only the cursor-agent CLI is)
     brave
     qbittorrent
     burpsuite
@@ -71,7 +76,6 @@
     cloudflared
     telegram-desktop
     railway
-    # chatgpt  # macOS-only upstream (repacked ChatGPT.app) - no Linux desktop app exists
   ]);
 
   # --- home manager self management

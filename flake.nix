@@ -7,6 +7,11 @@
 
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,10 +27,12 @@
           modules = [
             ./hosts/salad/configuration.nix
 
-            # CachyOS kernel overlay + selection + cache
+            # CachyOS kernel overlay + selection + cache; llm-agents overlay
+            # exposes numtide's AI tools as pkgs.llm-agents.*
             ({ pkgs, ... }: {
               nixpkgs.overlays = [
                 inputs.nix-cachyos-kernel.overlays.pinned
+                inputs.llm-agents.overlays.shared-nixpkgs
               ] ++ (import ./overlays/failure.nix { inherit nixpkgs-stable; });
 
               nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];

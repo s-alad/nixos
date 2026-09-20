@@ -110,8 +110,11 @@ The system uses a hybrid approach:
 nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"
 nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11"
 nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release" (tracks release branch, locked via flake.lock)
+llm-agents.url = "github:numtide/llm-agents.nix" (numtide AI-agent packages, follows nixpkgs, daily upstream updates)
 home-manager.url = "github:nix-community/home-manager" (active - NixOS module mode)
 ```
+
+**AI tools (numtide llm-agents.nix):** `claude-code`, `codex`, `opencode`, `crush` (Charmbracelet agent), `hunk` (diff TUI for agentic changesets), `claude-desktop` (official Linux desktop app beta), and `chatgpt` (official ChatGPT/Codex desktop app) come from the `llm-agents` input via its `shared-nixpkgs` overlay, exposed as `pkgs.llm-agents.*`. Rationale: numtide auto-updates daily from upstream (nixpkgs lags these fast-moving tools by weeks, and the two desktop apps aren't in nixpkgs at all yet). The input follows our nixpkgs, so packages build against the system's package set (cheap — they're patched official binaries, not compiled). `ua` updates this input alongside nixpkgs. Cursor stays as nixpkgs `code-cursor` (llm-agents only carries the `cursor-agent` CLI, not the IDE). Cowork (claude-desktop's VM tab) additionally needs `vhost_vsock` (loaded via `modules/system/boot.nix`) and would need QEMU/OVMF on the system if ever wanted — not installed by default.
 
 **Home-manager configuration in flake:**
 ```nix
@@ -148,7 +151,7 @@ The CachyOS kernel tracks the `release` branch in `flake.nix` and is locked to a
 | Command | What it updates | When to use |
 |---------|-----------------|-------------|
 | `ns` | Nothing (uses locked versions) | After editing config, adding/removing packages |
-| `ua` | Apps only (nixpkgs, home-manager, nixpkgs-stable) | **Daily/weekly updates** - safe, won't touch kernel |
+| `ua` | Apps only (nixpkgs, home-manager, nixpkgs-stable, llm-agents) | **Daily/weekly updates** - safe, won't touch kernel |
 | `nu` | **Everything** including kernel | When ready to update all inputs (check NVIDIA compat first) |
 
 **NVIDIA compatibility risk:**
@@ -320,7 +323,7 @@ pkgs.cachyosKernels.linuxPackages-cachyos-hardened # security-hardened
 
 ### Installed Development Tools
 
-Broadly: language toolchains (Node/Yarn, Go, OCaml, Rust, JDK, Python/uv), editors (VSCode, Cursor, Helix, Vim), containers (Docker), mobile/game dev (Android Studio, ADB, Watchman, Unity Hub, PrismLauncher), CLI/monitoring tools (ripgrep, jq, fzf, eza, zoxide, bat, tmux, ffmpeg, btop-cuda, nvtop, dysk, fastfetch), cloud SDKs (gcloud, AWS CLI v2), databases (Redis, MongoDB Compass), media (OBS with CUDA + virtual camera), and security tools (Wireshark, Burp Suite, ykman). For the authoritative list see `packages/system-packages.nix` and `packages/home-packages.nix`.
+Broadly: language toolchains (Node/Yarn, Go, OCaml, Rust, JDK, Python/uv), editors (VSCode, Cursor, Helix, Vim), AI coding agents (Claude Code, Codex, OpenCode, Claude Desktop, ChatGPT desktop — all via the numtide `llm-agents` overlay as `pkgs.llm-agents.*`), containers (Docker), mobile/game dev (Android Studio, ADB, Watchman, Unity Hub, PrismLauncher), CLI/monitoring tools (ripgrep, jq, fzf, eza, zoxide, bat, tmux, ffmpeg, btop-cuda, nvtop, dysk, fastfetch), cloud SDKs (gcloud, AWS CLI v2), databases (Redis, MongoDB Compass), media (OBS with CUDA + virtual camera), and security tools (Wireshark, Burp Suite, ykman). For the authoritative list see `packages/system-packages.nix` and `packages/home-packages.nix`.
 
 ### Nix Features Enabled
 
