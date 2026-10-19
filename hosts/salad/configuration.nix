@@ -196,7 +196,6 @@ in
         "nix-command"
         "flakes"
       ];
-      trusted-users = [ "@wheel" ];
       auto-optimise-store = true;
     };
   };
