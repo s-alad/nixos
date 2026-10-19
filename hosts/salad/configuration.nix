@@ -196,6 +196,15 @@ in
         "nix-command"
         "flakes"
       ];
+
+      # numtide binary cache: prebuilt llm-agents packages (codex, claude-code,
+      # chatgpt). declared in the llm-agents flake; set here because flake
+      # nixConfig is ignored for untrusted users.
+      extra-substituters = [ "https://cache.numtide.com" ];
+      extra-trusted-public-keys = [
+        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      ];
+
       auto-optimise-store = true;
     };
   };
