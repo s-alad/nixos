@@ -27,17 +27,13 @@
           modules = [
             ./hosts/salad/configuration.nix
 
-            # CachyOS kernel overlay + selection + cache; llm-agents overlay
+            # CachyOS kernel overlay + selection; llm-agents overlay
             # exposes numtide's AI tools as pkgs.llm-agents.*
             ({ pkgs, ... }: {
               nixpkgs.overlays = [
                 inputs.nix-cachyos-kernel.overlays.pinned
                 inputs.llm-agents.overlays.shared-nixpkgs
               ] ++ (import ./overlays/failure.nix { inherit nixpkgs-stable; });
-
-              nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
-              nix.settings.trusted-public-keys =
-                [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
             })
 
             # home-manager nixos module
