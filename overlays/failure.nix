@@ -66,4 +66,17 @@
       })
     ];
   })
+
+  # chatgpt 26.1016.51333 (llm-agents): a new native module
+  # (remote-control-device-key.node) links libtss2-*, which the package doesn't
+  # provide, so auto-formatelf fails. Remove once llm-agents adds tpm2-tss.
+  (final: prev: {
+    llm-agents = prev.llm-agents // {
+      chatgpt = prev.llm-agents.chatgpt.override {
+        chatgpt-unwrapped = prev.llm-agents.chatgpt.unwrapped.overrideAttrs (old: {
+          buildInputs = (old.buildInputs or [ ]) ++ [ final.tpm2-tss ];
+        });
+      };
+    };
+  })
 ]
