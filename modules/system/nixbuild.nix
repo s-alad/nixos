@@ -3,7 +3,7 @@
 # nixbuild.net remote builder. Currently inactive (distributedBuilds = false),
 # kept intact intentionally — do not remove.
 {
-  nix.distributedBuilds = false;
+  nix.distributedBuilds = true;
   nix.buildMachines = [
     {
       hostName = "eu.nixbuild.net";

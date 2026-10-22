@@ -31,7 +31,7 @@
             # exposes numtide's AI tools as pkgs.llm-agents.*
             ({ pkgs, ... }: {
               nixpkgs.overlays = [
-                inputs.nix-cachyos-kernel.overlays.pinned
+                inputs.nix-cachyos-kernel.overlays.default
                 inputs.llm-agents.overlays.shared-nixpkgs
               ] ++ (import ./overlays/failure.nix { inherit nixpkgs-stable; });
             })
