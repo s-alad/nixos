@@ -10,7 +10,6 @@
   boot.kernelModules = [ "kvm-intel" "vhost_vsock" ];
   # --- silent boot
   boot.consoleLogLevel = 3;
-  boot.initrd.verbose = false;
   boot.kernelParams = [
     # - intel reduce flickering
     "i915.enable_psr=0"
@@ -22,8 +21,6 @@
     "udev.log_priority=3"
     "rd.systemd.show_status=auto"
   ];
-  # --- systemd initrd for TPM2 auto-unlock
-  boot.initrd.systemd.enable = true;
   # --- LUKS devices (TPM2 enrolled)
   # - $ sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 /dev/nvme1n1p2
   # - $ sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 /dev/nvme1n1p3

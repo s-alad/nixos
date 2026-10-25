@@ -69,7 +69,6 @@
     mapscii
     monero-cli
     monero-gui
-    framesh
     # session-desktop  # 2026-08-04: unbuildable on both channels + uncached
     # (unstable 1.18.0 pnpm integrity bug; stable 1.17.5 better-sqlite3 vs V8).
     # See overlays/failure.nix. Re-enable once upstream builds again.

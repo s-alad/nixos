@@ -50,33 +50,4 @@
   #     is now 2.37.0, past the 2.36.0 fix).
   #   - wireshark src outputHash override (was for a non-byte-stable gitlab tarball;
   #     upstream 4.6.6's committed hash now resolves from cache.nixos.org).
-
-  # glean-parser 20.2.0 (mozillavpn dep): two expiry tests fail in the nix
-  # sandbox. Fixed upstream in nixpkgs 5aa947528e ("glean-parser: Fix build");
-  # remove once nixos-unstable includes it.
-  (final: prev: {
-    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-      (pyfinal: pyprev: {
-        glean-parser = pyprev.glean-parser.overridePythonAttrs (old: {
-          disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-            "tests/test_metrics.py::test_expires"
-            "tests/test_parser.py::test_expire_epoch_can_be_overriden"
-          ];
-        });
-      })
-    ];
-  })
-
-  # chatgpt 26.1016.51333 (llm-agents): a new native module
-  # (remote-control-device-key.node) links libtss2-*, which the package doesn't
-  # provide, so auto-formatelf fails. Remove once llm-agents adds tpm2-tss.
-  (final: prev: {
-    llm-agents = prev.llm-agents // {
-      chatgpt = prev.llm-agents.chatgpt.override {
-        chatgpt-unwrapped = prev.llm-agents.chatgpt.unwrapped.overrideAttrs (old: {
-          buildInputs = (old.buildInputs or [ ]) ++ [ final.tpm2-tss ];
-        });
-      };
-    };
-  })
 ]
