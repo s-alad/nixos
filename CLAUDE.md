@@ -67,7 +67,7 @@ The system now uses **Nix flakes** for reproducible, version-pinned configuratio
     │   ├── minecraft.nix      (Minecraft server firewall ports 25565)
     │   ├── networking.nix     (hostname, NetworkManager, captive-portal detection)
     │   ├── nix-ld.nix         (libraries for prebuilt binaries)
-    │   ├── nixbuild.nix       (nixbuild.net remote builder — inactive, kept intentionally)
+    │   ├── nixbuild.nix       (nixbuild.net remote builder — active; compiles the CachyOS kernel)
     │   ├── programs.nix       (firefox, java, adb, wireshark, obs, nh)
     │   ├── session-env.nix    (GUI-visible XDG tool-home env vars via PAM — pairs with modules/home/linux/xdg-tool-homes.nix)
     │   ├── sst.nix            (sudo NOPASSWD rule for `sst tunnel`)
@@ -144,9 +144,24 @@ sudo nixos-rebuild switch --flake path:/etc/nixos#salad
 
 **Note:** The `path:` prefix is used to include gitignored files (like `secrets.nix`) in the build without requiring `--impure` mode.
 
+### Remote Builds (nixbuild.net)
+
+`modules/system/nixbuild.nix` turns on `nix.distributedBuilds` with `eu.nixbuild.net` as the builder, so anything that can't be downloaded from a binary cache (mainly the CachyOS kernel on `nu`) is compiled there instead of on the laptop. No extra flags are needed — plain `ns`/`nb`/`ua`/`nu` use it.
+
+- **Auth**: the root nix-daemon connects with `/home/salad/.ssh/id_ed25519` (set in `programs.ssh.extraConfig`); the host key is pinned in `programs.ssh.knownHosts`
+- **`builders-use-substitutes = true`**: nixbuild.net fetches build inputs from cache.nixos.org itself instead of this machine uploading them
+- **`SetEnv NIXBUILDNET_KEEP_BUILDS_RUNNING=true`**: builds keep running on nixbuild.net if the client disconnects (shutdown, Ctrl+C); re-running the rebuild picks up the finished result. Ctrl+C does **not** cancel the remote build, and it is still billed
+- **Cost**: 25 free CPU hours/month, then €0.12 per CPU hour (CPUs × wall time). A derivation nixbuild.net hasn't seen before gets 2 CPUs (`default-cpu`); later builds are sized from history
+- **Check access** (from a normal terminal, not a sandboxed one): `nix store info --store ssh://eu.nixbuild.net`; account admin: `ssh eu.nixbuild.net shell`
+- `trusted-users` is `root` only, so `--builders` / `--option` overrides passed by salad on the command line are ignored — change builder settings in `nixbuild.nix`
+
+**CachyOS binary cache: intentionally not used.** The upstream cache (`attic.xuyh0120.win/lantian`) was taken down after the maintainer's servers were compromised in October 2026 ([xddxdd/nix-cachyos-kernel#110](https://github.com/xddxdd/nix-cachyos-kernel/issues/110)) and was removed from this config. It is back at `cache.lantian.pub/lantian` with a new signing key, but kernels are compiled on nixbuild.net instead (kernel source comes straight from CachyOS's GitHub releases, hash-checked by the flake).
+
 ### Update Strategy (IMPORTANT)
 
 The CachyOS kernel tracks the `release` branch in `flake.nix` and is locked to a specific commit via `flake.lock`. Running `nu` (which calls `nix flake update`) will update **all** inputs including the kernel.
+
+The kernel comes from `inputs.nix-cachyos-kernel.overlays.pinned` (in `flake.nix`), which builds it with the kernel flake's own pinned nixpkgs. That keeps the kernel derivation independent of our nixpkgs, so `ua` never rebuilds the kernel. The alternative, `overlays.default`, builds it with our nixpkgs: it can't drift out of step with the rest of the system, but the kernel recompiles on most `ua` runs. Only switch to `default` temporarily if the pinned kernel breaks against a newer nixpkgs (see Known Issues).
 
 | Command | What it updates | When to use |
 |---------|-----------------|-------------|
@@ -180,9 +195,9 @@ nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.l
 curl -s "https://api.github.com/repos/xddxdd/nix-cachyos-kernel/commits?sha=release&per_page=20" | jq -r '.[] | "\(.sha[:12]) \(.commit.committer.date[:10]) \(.commit.message | split("\n")[0])"'
 ```
 
-**Current kernel status (as of June 2026):**
-- Running: 7.1.1-cachyos
-- NVIDIA 595.x supports kernel 7.1 -- no compatibility issues
+**Current kernel status (as of October 2026):**
+- Running: 7.3.0-cachyos (pinned overlay, compiled on nixbuild.net)
+- NVIDIA 595.104.02 open modules build and load on 7.3 -- no compatibility issues
 
 ### Secrets Management
 
@@ -303,7 +318,7 @@ Stock tools: `vainfo` (Intel VA-API), `glxinfo | grep "OpenGL renderer"`, `vulka
 ### Kernel and Drivers
 
 - **kernel**: CachyOS Latest (`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest`)
-  - Currently running 7.1.1-cachyos with EEVDF scheduler
+  - Currently running 7.3.0-cachyos with EEVDF scheduler
   - CachyOS kernel provides performance optimizations and latest scheduler improvements
   - Kernel tracks the `release` branch, locked via `flake.lock` (not pinned with `?rev=`)
 - **nvidia drivers**: 595.x stable (`nvidiaPackages.stable`) with open kernel modules
@@ -426,7 +441,7 @@ Stock commands: `nixos-version`, `nix --version`, `uname -r` (kernel), `lspci | 
 - **locale**: en_US.UTF-8
 - **keyboard**: US layout
 - **system state version**: 25.11 (do not change without reading docs)
-- **nix settings**: flakes and nix-command enabled, trusted users include @wheel, auto-optimize-store enabled
+- **nix settings**: flakes and nix-command enabled, trusted-users is `root` only (no @wheel), auto-optimize-store enabled, remote builds via nixbuild.net (see Remote Builds)
 
 ## Boot Configuration
 
@@ -436,7 +451,7 @@ The system uses TPM2 to automatically unlock LUKS encryption at boot:
 
 - **boot flow**: plymouth splash → tpm2 auto-unlock → cinnamon login → desktop
 - **security**: password still required as backup if tpm2 fails
-- **configuration**: `boot.initrd.systemd.enable = true` enables tpm2 support
+- **configuration**: the systemd initrd provides TPM2 unlock (`boot.initrd.systemd.tpm2.enable` defaults to true). Since nixpkgs removed the scripted initrd (October 2026), the systemd initrd is the only one: `boot.initrd.systemd.enable` and `boot.initrd.verbose` no longer exist and setting them fails evaluation. Silent boot comes from the `quiet` / `rd.systemd.show_status=auto` / `udev.log_priority=3` kernel params in `boot.nix`
 
 **re-enrolling tpm2 after hardware changes:**
 
@@ -605,9 +620,18 @@ some features are commented out in modules that can be enabled:
 ### CachyOS Kernel + NVIDIA
 - **Issue**: New kernel versions may not be supported by NVIDIA drivers yet
 - **Symptom**: Build fails with errors like `too few arguments to function 'zone_device_page_init'`
-- **Current status**: NVIDIA 595.x supports kernel 7.1 -- no current issues
+- **Current status**: NVIDIA 595.104.02 builds against kernel 7.3 -- no current issues
 - **If it breaks after `nu`**: Use `ua` for safe updates (excludes kernel), or pin the kernel with `?rev=` in `flake.nix`
 - **Check compatibility**: `nix eval --raw 'github:xddxdd/nix-cachyos-kernel/release#packages.x86_64-linux.linux-cachyos-latest.version'`
+
+### Pinned CachyOS Kernel vs. Newer nixpkgs (modules.cer, October 2026)
+- **Symptom**: `linux-cachyos-latest-*-modules` fails with `cp: cannot stat '.../modules.cer': No such file or directory`
+- **Root cause**: nixpkgs' `aggregateModules` started merging per-module certificates ([NixOS/nixpkgs#571181](https://github.com/NixOS/nixpkgs/pull/571181)), but a kernel built by the CachyOS flake's older pinned nixpkgs has no `modules.cer` ([xddxdd/nix-cachyos-kernel#111](https://github.com/xddxdd/nix-cachyos-kernel/issues/111))
+- **Fix used**: temporarily switched to `overlays.default` (kernel built with our nixpkgs), then back to `overlays.pinned` once the release branch's pinned nixpkgs caught up (2026-10-24)
+- **If a mismatch like this recurs**: wait for the release branch to update and run `nu`, or switch to `overlays.default` until it does
+
+### framesh (Frame wallet)
+- Removed from nixpkgs on 2026-10-22 (archived upstream), so it was dropped from `home/salad.nix`
 
 ### Cinnamon Backlight / Brightness Keys
 - **Issue**: polkit 127 uses `realpath` when comparing `org.freedesktop.policykit.exec.path`, which breaks NixOS symlink paths. `csd-power` falls back from `gnome-rr` (xrandr Backlight property not available with `modesetting` driver) to `csd-backlight-helper` via `pkexec`, and polkit rejects the authorization because the resolved nix store path doesn't match the policy's symlink path.
