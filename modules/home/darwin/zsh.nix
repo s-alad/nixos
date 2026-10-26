@@ -16,6 +16,11 @@ in
     if [[ -z "$SSH_CONNECTION" && ( -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ) && -S "${sshAgentSocket}" ]]; then
       export SSH_AUTH_SOCK="${sshAgentSocket}"
     fi
+
+    # No duplicate PATH entries. Homebrew completions must be on fpath before
+    # compinit, and corporate.zsh loads after it.
+    typeset -U PATH
+    fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
   '';
 
   programs.zsh.shellAliases = {

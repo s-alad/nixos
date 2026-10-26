@@ -31,8 +31,15 @@ in
   # --- tidy up dotfile clutter into XDG state dirs (NODE_REPL_HISTORY shared via common/xdg-dotfiles.nix)
   home.sessionVariables = {
     LESSHISTFILE = "${config.xdg.stateHome}/less/history";
-    VIMINFOFILE = "${config.xdg.stateHome}/vim/viminfo";
   };
+
+  # --- vim has no viminfo env var; set it from ~/.config/vim/vimrc. Any vimrc
+  # --- disables defaults.vim (syntax, filetype, incsearch), so load it first.
+  xdg.configFile."vim/vimrc".text = ''
+    unlet! skip_defaults_vim
+    source $VIMRUNTIME/defaults.vim
+    set viminfofile=${config.xdg.stateHome}/vim/viminfo
+  '';
 
   # --- shared packages (system-level on NixOS, user-level here)
   home.packages =

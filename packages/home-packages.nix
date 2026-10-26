@@ -12,6 +12,6 @@ with pkgs; [
   buildifier
   wrangler
   nodejs
-  yarn
+  yarn-zpm # Yarn 6 (web-ui)
   lazydocker
 ]
