@@ -28,10 +28,17 @@ in
 
   xdg.enable = true;
 
-  # --- tidy up dotfile clutter into XDG state dirs (NODE_REPL_HISTORY shared via common/xdg-dotfiles.nix)
+  # --- tidy up dotfile clutter into XDG dirs (NODE_REPL_HISTORY shared via common/xdg-dotfiles.nix)
   home.sessionVariables = {
-    LESSHISTFILE = "${config.xdg.stateHome}/less/history";
+    LESSHISTFILE      = "${config.xdg.stateHome}/less/history";  # ~/.lesshst
+    NPM_CONFIG_CACHE  = "${config.xdg.cacheHome}/npm";           # ~/.npm
+    GNUPGHOME         = "${config.xdg.dataHome}/gnupg";          # ~/.gnupg (macOS only; NixOS gpg-agent sockets expect the default)
+    VAULT_CONFIG_PATH = "${config.xdg.configHome}/vault/config"; # ~/.vault
   };
+
+  # --- /etc/nix/nix.custom.conf sets use-xdg-base-directories, so ~/.nix-profile
+  # --- and ~/.nix-defexpr live in ~/.local/state/nix. Tell HM where the profile is.
+  nix.assumeXdg = true;
 
   # --- vim has no viminfo env var; set it from ~/.config/vim/vimrc. Any vimrc
   # --- disables defaults.vim (syntax, filetype, incsearch), so load it first.
