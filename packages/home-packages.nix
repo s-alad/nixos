@@ -8,7 +8,6 @@ with pkgs; [
   kubectx
   kubernetes-helm
   skaffold
-  bazelisk
   buildifier
   wrangler
   nodejs

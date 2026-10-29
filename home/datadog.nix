@@ -57,6 +57,7 @@ in
       btop
       gawk
       devenv-init
+      nerd-fonts.meslo-lg # Terminal.app's Basic profile font
     ]);
 
   # --- override the shared module's settings so HM doesn't create a read-only
